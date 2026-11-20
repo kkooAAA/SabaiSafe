@@ -114,7 +114,9 @@ export async function runScenario(s: Scenario, post: Post): Promise<ScenarioScor
 }
 
 /** Entry from evals/run.ts (`--report`). Returns the hard-gate failures. */
-export async function runReportEval(opts: { url?: string; mock: boolean }): Promise<string[]> {
+export async function runReportEval(opts: { url?: string; mock: boolean; only?: string[] }): Promise<string[]> {
+  const scenarios = opts.only ? SCENARIOS.filter((s) => opts.only!.includes(s.id)) : SCENARIOS;
+  if (!scenarios.length) return [`no report scripts match --only (have: ${SCENARIOS.map((s) => s.id).join(", ")})`];
   const routes = opts.url
     ? null
     : {
@@ -137,9 +139,9 @@ export async function runReportEval(opts: { url?: string; mock: boolean }): Prom
     }
   };
 
-  console.log(`SabaiSafe Report eval: ${SCENARIOS.length} scripts, mode ${opts.url ? `HTTP ${opts.url}` : opts.mock ? "MOCK (in-process)" : "REAL in-process"}`);
+  console.log(`SabaiSafe Report eval: ${scenarios.length} scripts, mode ${opts.url ? `HTTP ${opts.url}` : opts.mock ? "MOCK (in-process)" : "REAL in-process"}`);
   const scores = [];
-  for (const s of SCENARIOS) {
+  for (const s of scenarios) {
     const r = await runScenario(s, post).catch((e: Error) => ({ id: s.id, lang: s.lang, ready_at: null, pdf_ok: null, failures: [`threw: ${e.message}`] }));
     scores.push(r);
     console.log(`${r.failures.length ? "FAIL" : "ok  "} ${r.id.padEnd(11)} ready@${r.ready_at ?? "-"} pdf ${r.pdf_ok ?? "-"}${r.failures.length ? `  <- ${r.failures.join("; ")}` : ""}`);

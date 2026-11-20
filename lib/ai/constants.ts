@@ -22,12 +22,23 @@ export { computeVerdict, FAR_ABOVE_FACTOR, VERDICT_ZH, type PriceVerdict } from 
 export const EXTRACT_RETRY_MESSAGE =
   "Your previous reply was not valid JSON matching the shape. Reply again with ONLY the JSON object.";
 
-/** Default similarity threshold for legal retrieval (override with LEGAL_MIN_SIMILARITY). */
+/** Default similarity threshold for legal retrieval (OpenAI text-embedding-3-small and mock). */
 export const DEFAULT_MIN_SIMILARITY = 0.3;
 
-export function minSimilarity(): number {
+/**
+ * Per-embedding-model defaults, keyed by provider.ts#embeddingModelId(). Gemini scores sit much higher than OpenAI's:
+ * live probe 2026-11-20, top hit for in-scope questions 0.66–0.80, for off-topic ones 0.54–0.57, so 0.30 let
+ * everything through. 0.62 sits between the two.
+ */
+export const MIN_SIMILARITY_BY_EMBEDDING: Readonly<Record<string, number>> = {
+  "google:gemini-embedding-001@1536": 0.62,
+};
+
+/** LEGAL_MIN_SIMILARITY (0 < v < 1) overrides everything; else the model's default; else DEFAULT_MIN_SIMILARITY. */
+export function minSimilarity(embeddingModelId?: string): number {
   const v = Number(process.env.LEGAL_MIN_SIMILARITY);
-  return Number.isFinite(v) && v > 0 && v < 1 ? v : DEFAULT_MIN_SIMILARITY;
+  if (process.env.LEGAL_MIN_SIMILARITY?.trim() && Number.isFinite(v) && v > 0 && v < 1) return v;
+  return (embeddingModelId && MIN_SIMILARITY_BY_EMBEDDING[embeddingModelId]) || DEFAULT_MIN_SIMILARITY;
 }
 
 /**

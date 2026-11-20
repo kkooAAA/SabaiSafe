@@ -19,7 +19,9 @@ Languages: English (default) and Simplified Chinese for the interface and answer
 - next-intl for i18n, with routes under `app/[locale]/` where locale = `en` | `zh`
 - Supabase: Postgres + pgvector + Storage; `@supabase/ssr` for clients
 - Vercel AI SDK (`ai` package) for streaming chat; provider set by env `AI_PROVIDER`
-- Embeddings: OpenAI `text-embedding-3-small` (1536 dims)
+- Providers: `AI_PROVIDER` = `anthropic` | `openai` | `google` | `mock` (Google/Gemini added 2026-11-20, user-approved)
+- Embeddings (1536 dims): OpenAI `text-embedding-3-small`, or Google `gemini-embedding-001` at 1536 dims when
+  `EMBEDDING_PROVIDER=google` (the default with `AI_PROVIDER=google`). Switching requires a re-ingest.
 - Deploy: Vercel
 - Package manager: pnpm
 

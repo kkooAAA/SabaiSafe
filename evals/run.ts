@@ -2,10 +2,11 @@
 //   pnpm eval                         in-process: imports POST from app/api/chat/route.ts
 //   pnpm eval -- --url http://localhost:3000   against a running app (real keys live in the app; retries on 429)
 //   --shape-only   skip the retrieval gates (e.g. --url against a server running AI_PROVIDER=mock)
+//   --live         real in-process provider calls (otherwise in-process runs are ALWAYS mock, whatever .env says)
 //   --report       run the Report Assistant eval instead (evals/report.ts; scripted interviews → generate → PDF)
 //   options: --lang en|zh  --only en-01,zh-03  --out evals/results/x.json  --min-hit 0.8  --delay 0
 //
-// Mode: if AI_PROVIDER=mock, or no ANTHROPIC/OPENAI key is set, the in-process run uses AI_PROVIDER=mock and
+// Mode: the in-process run is MOCK unless --live is given (then the provider from env is used) and
 // prints "MOCK". Mock answers are canned, so the retrieval scores are NOT a quality measure in mock mode;
 // the shape gates (stream complete, trailer, disclaimer, citations,
 // language, no invented numbers) still run. Mock retrieval is lexical (hashed-token embeddings over content/legal,
@@ -18,7 +19,7 @@ import { hardFailures, scoreAnswer, summarize, type EvalQuestion, type QuestionS
 
 loadEnv({ path: [".env.local", ".env"], quiet: true });
 
-type Args = { shapeOnly?: boolean; report?: boolean; url?: string; lang?: string; only?: string[]; out: string; minHit: number; delay: number };
+type Args = { shapeOnly?: boolean; report?: boolean; live?: boolean; url?: string; lang?: string; only?: string[]; out: string; minHit: number; delay: number };
 
 function parseArgs(argv: string[]): Args {
   const a: Args = { out: join("evals", "results", "latest.json"), minHit: 0.8, delay: 0 };
@@ -27,6 +28,10 @@ function parseArgs(argv: string[]): Args {
     const v = argv[i + 1];
     if (k === "--shape-only") {
       a.shapeOnly = true;
+      continue;
+    }
+    if (k === "--live") {
+      a.live = true;
       continue;
     }
     if (k === "--report") {
@@ -58,17 +63,25 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   let mock = false;
   if (!args.url) {
+    // Live provider calls cost quota (the free Gemini key allows 20 requests/model/day), so the in-process run is
+    // MOCK unless --live is passed explicitly, whatever .env.local says.
     const p = (process.env.AI_PROVIDER ?? "").trim().toLowerCase();
-    const hasKeys = !!process.env.OPENAI_API_KEY && (p === "openai" || !!process.env.ANTHROPIC_API_KEY);
-    if (p === "mock" || !hasKeys) {
+    if (!args.live || p === "mock") {
+      if (p && p !== "mock") console.log(`(AI_PROVIDER=${p} in env ignored: pass --live for a real in-process run)`);
       process.env.AI_PROVIDER = "mock";
       mock = true;
+      // A threshold tuned for real embeddings (e.g. LEGAL_MIN_SIMILARITY=0.62 for Gemini) would make mock retrieval
+      // refuse everything; mock uses its own per-model default (minSimilarity("mock")).
+      if (process.env.LEGAL_MIN_SIMILARITY) {
+        console.log(`(LEGAL_MIN_SIMILARITY=${process.env.LEGAL_MIN_SIMILARITY} ignored in mock mode)`);
+        delete process.env.LEGAL_MIN_SIMILARITY;
+      }
     }
   }
 
   if (args.report) {
     const { runReportEval } = await import("./report");
-    const gates = await runReportEval({ url: args.url, mock });
+    const gates = await runReportEval({ url: args.url, mock, only: args.only });
     if (gates.length) {
       console.log(`GATES FAILED:\n  - ${gates.join("\n  - ")}`);
       process.exitCode = 1;
@@ -134,6 +147,10 @@ async function main() {
   console.log(`  complete streams     ${pct(sum.complete_rate)}`);
 
   const gates = hardFailures(sum);
+  if (mock && sum.no_answer_rate_in_scope > 0.5) {
+    // Mock baseline is ~36%; above 50% means retrieval collapsed (e.g. a real-embedding threshold leaked into mock).
+    gates.push(`mock in-scope no-answer ${pct(sum.no_answer_rate_in_scope)} > 50% (retrieval collapsed?)`);
+  }
   if (!mock && !args.shapeOnly) {
     if (sum.hit_rate < args.minHit) gates.push(`hit_rate ${pct(sum.hit_rate)} < ${pct(args.minHit)}`);
     if (sum.oos_no_answer_rate < 0.5) gates.push(`out-of-scope refused ${pct(sum.oos_no_answer_rate)} < 50%`);

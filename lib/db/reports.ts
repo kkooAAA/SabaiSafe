@@ -36,20 +36,28 @@ function inMemoryMode(): boolean {
 }
 
 // ---------------------------------------------------------------- in-memory store (tests)
+// On globalThis, not a module-level Map: `next dev` gives every route (save, [id]) its own copy of this module,
+// so a module Map made save → GET return 404 there. One shared store per process.
 type MemRow = ReportInsert & { id: string; consent_at: string; expires_at: string };
-const mem = new Map<string, MemRow>();
+declare global {
+  var __sabaisafeReports: Map<string, MemRow> | undefined;
+}
+function memStore(): Map<string, MemRow> {
+  return (globalThis.__sabaisafeReports ??= new Map());
+}
 
 function memPrune(now: Date): void {
+  const mem = memStore();
   for (const [id, r] of mem) if (Date.parse(r.expires_at) < now.getTime()) mem.delete(id);
 }
 
 /** Tests only. */
 export function resetMemoryReports(): void {
-  mem.clear();
+  memStore().clear();
 }
 /** Tests only: number of rows in the in-memory store (to check prune-on-insert). */
 export function memoryReportCount(): number {
-  return mem.size;
+  return memStore().size;
 }
 
 // ---------------------------------------------------------------- API
@@ -72,7 +80,7 @@ export async function saveReport(input: SaveReportInput, opts: Options = {}): Pr
     memPrune(now);
     const id = randomUUID();
     const expires_at = new Date(now.getTime() + TTL_MS).toISOString();
-    mem.set(id, { ...row, id, consent_at: now.toISOString(), expires_at });
+    memStore().set(id, { ...row, id, consent_at: now.toISOString(), expires_at });
     return { id, expires_at, delete_token };
   }
   if (isSampleMode()) throw new DbUnavailableError("Saving reports needs a database (sample mode)");
@@ -94,7 +102,7 @@ async function lookup(id: string, token: string, now: Date): Promise<Lookup | nu
   let row: Lookup | null = null;
   if (valid) {
     if (inMemoryMode()) {
-      row = mem.get(id.toLowerCase()) ?? null;
+      row = memStore().get(id.toLowerCase()) ?? null;
     } else {
       if (isSampleMode()) throw new DbUnavailableError("Reports need a database (sample mode)");
       const { data, error } = await createServiceClient()
@@ -122,7 +130,7 @@ export async function getReport(id: string, token: string, opts: Options = {}): 
 export async function deleteReport(id: string, token: string, opts: Options = {}): Promise<boolean> {
   const row = await lookup(id, token, opts.now ?? new Date());
   if (!row) return false;
-  if (inMemoryMode()) return mem.delete(id.toLowerCase());
+  if (inMemoryMode()) return memStore().delete(id.toLowerCase());
   const { error } = await createServiceClient().from("reports").delete().eq("id", id);
   if (error) throw new DbError("Failed to delete report", { cause: error });
   return true;

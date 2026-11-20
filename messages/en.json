@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "SabaiSafe",
-    "tagline": "Safety and legal information for tourists in Phuket"
+    "tagline": "Safety and legal information for tourists in Phuket",
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "label": "Main navigation",
@@ -101,7 +102,17 @@
       "receipts": "Gives receipts"
     },
     "checkedOn": "Checked on {date}",
-    "sampleNotice": "Demo listings marked “Sample data” are fictional."
+    "sampleNotice": "Demo listings marked “Sample data” are fictional.",
+    "notEndorsement": "A listing is not an endorsement or a guarantee. We only check the basic criteria below, using public information or what the business tells us. “Sponsored” means the business paid to be listed; it does not change the order or the criteria. If something goes wrong, call Tourist Police 1155.",
+    "criteriaHelpTitle": "What the criteria mean",
+    "criteriaHelp": {
+      "registered_business": "Has a Thai business registration or tourism licence.",
+      "displays_prices": "Shows prices before you pay, so you can compare.",
+      "written_contract": "For rentals: gives a written contract in English or Chinese.",
+      "no_passport_deposit": "For rentals: does not keep your passport as a deposit.",
+      "insurance": "For rentals and activities: insurance is included or offered.",
+      "receipts": "Gives a receipt when you pay."
+    }
   },
   "price": {
     "title": "Fair Price",
@@ -147,7 +158,8 @@
       "invalidQuoted": "Enter a price in baht, e.g. 1200 (leave empty to see the typical range).",
       "comparedWith": "Compared with:",
       "noDataHint": "We have no reference price for this yet. If you feel pressured or cheated, you can call:",
-      "otherCurrency": "Please enter the price in Thai baht (THB), not another currency."
+      "otherCurrency": "Please enter the price in Thai baht (THB), not another currency.",
+      "retry": "Try again"
     },
     "verdict": {
       "within": "Within normal range",
@@ -163,7 +175,8 @@
     "network": "Connection problem. Check your internet and try again.",
     "rate_limited": "Too many requests. Please wait a minute and try again.",
     "unavailable": "This feature is not available right now.",
-    "invalid": "Please check your question and try again."
+    "invalid": "Please check your question and try again.",
+    "busy": "The AI service is busy. Please try again in a minute."
   },
   "common": {
     "comingSoon": "This feature is coming soon.",
@@ -177,7 +190,8 @@
     "call": "Call",
     "all": "All",
     "unavailable": "This information is temporarily unavailable. Please try again later.",
-    "draft": "Draft — not yet verified"
+    "draft": "Draft — not yet verified",
+    "cancel": "Cancel"
   },
   "legal": {
     "title": "Legal Guide",
@@ -314,8 +328,100 @@
       "invalid": "The request was not accepted. Please try again.",
       "incomplete": "The reply was cut off. Please try again.",
       "generic": "Something went wrong. Please try again.",
-      "replace_failed": "Your earlier saved summary could not be deleted, so this one was not saved. Please try again."
+      "replace_failed": "Your earlier saved summary could not be deleted, so this one was not saved. Please try again.",
+      "busy": "The AI service is busy. Please try again in a minute."
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "intro": "Manage reference prices and listed businesses. Changes appear on the Fair Price and Help pages.",
+    "tabsLabel": "Data to manage",
+    "tabs": {
+      "prices": "Prices",
+      "businesses": "Businesses"
     },
-    "cancel": "Cancel"
+    "search": "Search",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deactivate": "Deactivate",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "back": "Back to list",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "empty": "Nothing found.",
+    "count": "{count} of {total}",
+    "inactive": "Inactive",
+    "confirmDelete": "Delete this price row? This cannot be undone.",
+    "confirmDeactivate": "Deactivate this business? It will no longer be shown on the Help page.",
+    "createTitle": {
+      "prices": "New price",
+      "businesses": "New business"
+    },
+    "editTitle": {
+      "prices": "Edit price",
+      "businesses": "Edit business"
+    },
+    "requiredHint": "Fields marked * are required.",
+    "sampleMode": "Sample mode: no database is connected. Changes are kept in memory only and are lost when the server restarts.",
+    "flash": {
+      "created": "Created.",
+      "saved": "Saved.",
+      "deleted": "Deleted.",
+      "deactivated": "Deactivated.",
+      "unchanged": "No changes to save."
+    },
+    "flashNotPersisted": "(Not persisted: sample mode.)",
+    "field": {
+      "item_key": "Item key (lowercase, e.g. taxi_airport_patong)",
+      "item_name_en": "Item name (English)",
+      "item_name_zh": "Item name (Chinese)",
+      "category": "Category",
+      "area": "Area",
+      "min_thb": "Minimum price (THB)",
+      "max_thb": "Maximum price (THB)",
+      "unit": "Unit",
+      "is_fixed_by_law": "Price is fixed by law",
+      "source": "Source",
+      "source_url": "Source link",
+      "collected_at": "Date collected",
+      "notes": "Notes (English)",
+      "notes_zh": "Notes (Chinese)",
+      "is_sample": "Sample data (not real)",
+      "name": "Name",
+      "name_zh": "Name (Chinese)",
+      "address": "Address",
+      "phone": "Phone",
+      "website": "Website",
+      "google_maps_url": "Google Maps link",
+      "description_en": "Description (English)",
+      "description_zh": "Description (Chinese)",
+      "criteria_met": "Criteria met",
+      "verified_at": "Date verified",
+      "is_sponsored": "Sponsored (paid listing)",
+      "is_active": "Active (shown on the Help page)"
+    },
+    "errors": {
+      "required": "Required.",
+      "number": "Enter a number, e.g. 1200.",
+      "date": "Enter a date (YYYY-MM-DD).",
+      "url": "Enter a full link starting with https://.",
+      "option": "Choose one of the options.",
+      "min_max": "The maximum must be at least the minimum.",
+      "fixed_needs_source": "A price fixed by law needs a source link.",
+      "phone_needs_source": "A phone number needs a source link.",
+      "phone_needs_verified": "A phone number needs a verification date.",
+      "slug": "Use lowercase letters, digits and _ only.",
+      "formHasErrors": "Please fix the highlighted fields.",
+      "network": "Connection problem. Please try again.",
+      "unauthorized": "Please sign in again (reload the page).",
+      "unavailable": "Admin is not available: no admin password is set, or the database is down.",
+      "not_found": "This row no longer exists. Reload the list.",
+      "conflict": "A row with the same item, area, source and date already exists.",
+      "invalid": "The server did not accept this change.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

@@ -6,8 +6,8 @@ import enMessages from "@/messages/en.json";
 import zhMessages from "@/messages/zh.json";
 import { findPrices } from "@/lib/db/prices";
 import { fairPriceSystem, fairPriceUser } from "./prompts";
-import { chatModel } from "./provider";
-import { textDeltas, textStreamResponse } from "./stream";
+import { chatModel, modelCallOptions } from "./provider";
+import { textDeltas, textStreamResponse, primeDeltas } from "./stream";
 
 /**
  * Readable unit for the model (so the PriceUnit key never leaks into the answer).
@@ -41,6 +41,7 @@ export async function explainPrice(req: PriceExplainRequest, signal?: AbortSigna
   const model = chatModel();
   const itemLabel = refs[0] ? (req.lang === "zh" ? refs[0].item_name_zh || refs[0].item_name_en : refs[0].item_name_en) : req.item;
   const result = streamText({
+    ...modelCallOptions(),
     model,
     system: fairPriceSystem(req.lang),
     prompt: fairPriceUser(itemLabel, req.quoted, toPromptRefs(refs, req.lang), verdict),
@@ -48,7 +49,7 @@ export async function explainPrice(req: PriceExplainRequest, signal?: AbortSigna
     maxOutputTokens: 400,
     abortSignal: signal,
   });
-  return textStreamResponse(textDeltas(result.stream), {
+  return textStreamResponse(await primeDeltas(textDeltas(result.stream)), {
     onError: (err) => console.error("[/api/chat/price] stream failed", err),
   });
 }

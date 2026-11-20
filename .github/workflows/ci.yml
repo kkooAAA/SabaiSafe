@@ -24,7 +24,7 @@ jobs:
       # Secrets and server-only code must never reach the browser bundle (CLAUDE.md: no API keys in client code).
       - name: Scan client bundle for secrets
         run: |
-          if grep -rlE 'SUPABASE_SERVICE_ROLE_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|ADMIN_PASSWORD|sk-ant-|sk-proj-|service_role|REPORT_EXTRACT_SYSTEM|QUERY_REWRITE_SYSTEM|delete_token_hash|timingSafeEqual|PDFDocument|formal Thai incident summary' .next/static; then
+          if grep -rlE 'SUPABASE_SERVICE_ROLE_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|GOOGLE_GENERATIVE_AI_API_KEY|AIza[0-9A-Za-z_-]{35}|ADMIN_PASSWORD|sk-ant-|sk-proj-|service_role|REPORT_EXTRACT_SYSTEM|QUERY_REWRITE_SYSTEM|delete_token_hash|timingSafeEqual|PDFDocument|formal Thai incident summary' .next/static; then
             echo "::error::secret name or server-only prompt found in .next/static"
             exit 1
           fi

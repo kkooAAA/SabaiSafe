@@ -6,7 +6,7 @@ import type { Business, HelpContact, HelpResponse } from "@/types/api";
 import { createAnonClient, isSampleMode } from "./client";
 import { DbError } from "./errors";
 import { filterHelp } from "./query";
-import { getSampleData } from "./sample";
+import { getSampleData, sampleOverlay } from "./sample";
 import { BUSINESS_CATEGORIES, HELP_CATEGORIES } from "./schema";
 
 /** Valid `category` values for GET /api/help: any HelpContact or Business category. */
@@ -22,10 +22,18 @@ const CONTACT_COLUMNS =
 const BUSINESS_COLUMNS =
   "id,name,name_zh,category,area,address,phone,website,google_maps_url,source_url,description_en,description_zh,criteria_met,is_sponsored,verified_at,is_active,is_sample";
 
-let cache: { at: number; contacts: HelpContact[]; businesses: Business[] } | null = null;
+type HelpCache = { at: number; contacts: HelpContact[]; businesses: Business[] };
+// On globalThis so every route bundle (next dev) shares one cache and an admin write clears it for all.
+declare global {
+  var __sabaisafeHelpCache: HelpCache | undefined;
+}
 
 async function loadHelp(): Promise<{ contacts: HelpContact[]; businesses: Business[] }> {
-  if (isSampleMode()) return getSampleData();
+  if (isSampleMode()) {
+    const { contacts, businesses } = getSampleData();
+    return { contacts, businesses: sampleOverlay()?.businesses ?? businesses };
+  }
+  const cache = globalThis.__sabaisafeHelpCache;
   if (cache && Date.now() - cache.at < TTL_MS) return cache;
   const db = createAnonClient();
   const [c, b] = await Promise.all([
@@ -34,8 +42,9 @@ async function loadHelp(): Promise<{ contacts: HelpContact[]; businesses: Busine
   ]);
   if (c.error) throw new DbError("Failed to load help_contacts", { cause: c.error });
   if (b.error) throw new DbError("Failed to load businesses", { cause: b.error });
-  cache = { at: Date.now(), contacts: (c.data ?? []) as HelpContact[], businesses: (b.data ?? []) as Business[] };
-  return cache;
+  const fresh: HelpCache = { at: Date.now(), contacts: (c.data ?? []) as HelpContact[], businesses: (b.data ?? []) as Business[] };
+  globalThis.__sabaisafeHelpCache = fresh;
+  return fresh;
 }
 
 /** Contacts (always incl. the four hotlines) and active businesses, optionally filtered by category. */
@@ -46,5 +55,5 @@ export async function getHelp(query: { category?: HelpCategoryParam | null } = {
 
 /** Tests / admin writes: drop the 60 s cache. */
 export function resetHelpCache(): void {
-  cache = null;
+  globalThis.__sabaisafeHelpCache = undefined;
 }

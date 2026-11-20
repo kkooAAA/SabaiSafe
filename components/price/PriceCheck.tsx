@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Markdown } from "@/components/shared/Markdown";
 import { HotlineLink } from "@/components/shared/HotlineLink";
 import { formatThbRange, pickLang } from "@/components/shared/format";
-import { postTextStream } from "@/components/shared/text-stream";
+import { aiErrorKey, postTextStream } from "@/components/shared/text-stream";
 import { looksLikeOtherCurrency, parseQuoted, unitsOf, VERDICT_KEY } from "./quote";
 import { filterPrices } from "./picker";
 
@@ -59,6 +59,7 @@ export function PriceCheck({
   const [errorKey, setErrorKey] = useState("generic");
   const [checked, setChecked] = useState<Checked | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const reset = () => {
     abortRef.current?.abort();
@@ -99,7 +100,7 @@ export function PriceCheck({
       );
       if (ac.signal.aborted) return;
       if (!r.ok) {
-        setErrorKey(["rate_limited", "unavailable"].includes(r.code) ? r.code : "generic");
+        setErrorKey(aiErrorKey(r.status, r.code) ?? "generic");
         setStatus("error");
       } else if (r.error) {
         setErrorKey("incomplete");
@@ -122,7 +123,7 @@ export function PriceCheck({
         <Sparkles className="size-4 text-primary" aria-hidden />
         {t("check.title")}
       </h2>
-      <form onSubmit={onSubmit} noValidate className="grid gap-2">
+      <form ref={formRef} onSubmit={onSubmit} noValidate className="grid gap-2">
         <div className="flex flex-wrap items-end gap-2">
           <label className="grid min-w-0 flex-1 basis-36 gap-1 text-sm font-medium">
             {t("check.quotedLabel")}
@@ -212,14 +213,23 @@ export function PriceCheck({
       )}
 
       {text && (
-        <div aria-live="polite" className="rounded-lg bg-background p-3">
+        <div aria-live="polite" aria-busy={status === "loading" || undefined} className="rounded-lg bg-background p-3">
           <Markdown>{text}</Markdown>
         </div>
       )}
       {status === "error" && (
-        <p role="alert" className="text-sm text-destructive">
-          {te(errorKey)}
-        </p>
+        <div role="alert" className="space-y-2" data-testid="price-check-error">
+          <p className="text-sm text-destructive">{te(errorKey)}</p>
+          {/* Resubmits the same form: item, area, unit and the quoted price are kept. */}
+          <button
+            type="button"
+            onClick={() => formRef.current?.requestSubmit()}
+            className="h-11 rounded-md border bg-background px-4 text-sm font-medium"
+            data-testid="price-check-retry"
+          >
+            {t("check.retry")}
+          </button>
+        </div>
       )}
       <p className="text-xs text-muted-foreground">{t("check.note")}</p>
     </section>

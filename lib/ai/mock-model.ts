@@ -1,4 +1,5 @@
 // Canned responses for AI_PROVIDER=mock. See the MOCK MODE block in lib/ai/provider.ts for the behaviour spec.
+import { APICallError } from "ai";
 import type { MockLanguageModelV4 } from "ai/test";
 import {
   DISCLAIMER,
@@ -72,6 +73,28 @@ function reply(text: string, failAfterFirstChunk: boolean): MockReply {
         },
       });
       return { stream };
+    },
+  };
+}
+
+/** Both generate() and stream() reject before any output, like a Gemini 429 RESOURCE_EXHAUSTED. */
+function busyReply(): MockReply {
+  const err = () =>
+    new APICallError({
+      message: "mock upstream quota exceeded (UPSTREAMBUSY)",
+      url: "mock://model",
+      requestBodyValues: {},
+      statusCode: 429,
+      responseBody: '{"error":{"status":"RESOURCE_EXHAUSTED","message":"mock GenerateRequestsPerDayPerProjectPerModel-FreeTier"}}',
+      // Not retryable: mirrors Google's fail-fast (maxRetries 0) so the mock doesn't sit in SDK backoff.
+      isRetryable: false,
+    });
+  return {
+    generate: async () => {
+      throw err();
+    },
+    stream: async () => {
+      throw err();
     },
   };
 }
@@ -214,6 +237,7 @@ export function mockRespond(prompt: LanguageModelV4Prompt): MockReply {
   const userMsgs = prompt.filter((m) => m.role === "user").map(partText);
   const userText = userMsgs.join("\n");
   const fail = userText.includes(MOCK_TRIGGERS.streamError);
+  if (userText.includes(MOCK_TRIGGERS.upstreamBusy)) return busyReply();
   const langOf = (fn: (l: Lang) => string) => LANGS.find((l) => system === fn(l));
 
   if (system === QUERY_REWRITE_SYSTEM) return reply(rewriteJson(userText), fail);

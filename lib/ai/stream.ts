@@ -21,6 +21,21 @@ export async function* textDeltas(parts: AsyncIterable<StreamPartLike>): AsyncGe
   }
 }
 
+/**
+ * Waits for the first delta before the Response is created, so a model failure before any output (e.g. 429 from
+ * both the primary and the fallback model) is thrown to the route and becomes a JSON error (503 unavailable), not
+ * a 200 stream ending in ERROR_MARKER. Failures after the first delta still end the stream with ERROR_MARKER.
+ */
+export async function primeDeltas(deltas: AsyncIterable<string>): Promise<AsyncIterable<string>> {
+  const it = deltas[Symbol.asyncIterator]();
+  const first = await it.next();
+  return (async function* () {
+    if (first.done) return;
+    yield first.value;
+    for (let r = await it.next(); !r.done; r = await it.next()) yield r.value;
+  })();
+}
+
 /** A fixed string as an async iterable (for answers that don't call a model, e.g. no_answer). */
 export async function* fixedText(text: string): AsyncGenerator<string> {
   yield text;

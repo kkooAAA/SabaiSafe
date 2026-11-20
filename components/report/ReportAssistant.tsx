@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 import type { UiLang } from "@/types/api";
 import { postTextStream } from "@/components/shared/text-stream";
-import { ConfirmButton } from "./ConfirmButton";
+import { ConfirmButton } from "@/components/shared/ConfirmButton";
 import { InterviewChat, type ChatStatus } from "./InterviewChat";
 import { PrivacyNotice } from "./PrivacyNotice";
 import { SaveReport } from "./SaveReport";

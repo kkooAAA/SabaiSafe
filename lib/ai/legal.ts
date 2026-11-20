@@ -15,9 +15,9 @@ import { LEGAL_TOPICS, excerptOf } from "./legal-content";
 import { matchSample } from "./legal-index";
 import { MOCK_TRIGGERS } from "./mock-fixtures";
 import { QUERY_REWRITE_SYSTEM, legalGuideSystem, legalGuideUser } from "./prompts";
-import { AiUnavailableError, chatModel, embed, fastModel, isMock, requireEmbeddingKey } from "./provider";
+import { AiUnavailableError, chatModel, embed, embeddingModelId, fastModel, isMock, requireEmbeddingKey, modelCallOptions } from "./provider";
 import { scrubPII } from "./scrub";
-import { fixedText, textDeltas, textStreamResponse } from "./stream";
+import { fixedText, textDeltas, textStreamResponse, primeDeltas } from "./stream";
 
 /** Rows asked from match_legal per search (contracts §3.1) and the most sources given to the model. */
 export const MATCH_COUNT = 6;
@@ -65,6 +65,7 @@ export async function rewriteQuery(question: string, signal?: AbortSignal): Prom
   const model = fastModel();
   try {
     const { text } = await generateText({
+      ...modelCallOptions(),
       model,
       system: QUERY_REWRITE_SYSTEM,
       prompt: question,
@@ -157,8 +158,8 @@ export async function answerLegal(req: ChatRequest, signal?: AbortSignal): Promi
   const rewrite = await rewriteQuery(question, signal);
 
   const skipRetrieval = isMock() && question.includes(MOCK_TRIGGERS.noAnswer);
-  const rows = skipRetrieval ? [] : await retrieve(await embed(rewrite.search_query), lang);
-  const chosen = selectSources(rows, lang, minSimilarity());
+  const rows = skipRetrieval ? [] : await retrieve(await embed(rewrite.search_query, { task: "query" }), lang);
+  const chosen = selectSources(rows, lang, minSimilarity(embeddingModelId()));
 
   const meta = { is_emergency: rewrite.is_emergency, topic: rewrite.topic, location: rewrite.location };
 
@@ -169,6 +170,7 @@ export async function answerLegal(req: ChatRequest, signal?: AbortSignal): Promi
 
   const trailer: ChatTrailer = { sources: toLegalSources(chosen), meta: { ...meta, no_answer: false } };
   const result = streamText({
+    ...modelCallOptions(),
     model: answerModel,
     system: legalGuideSystem(lang),
     prompt: legalGuideUser(question, toPromptSources(chosen)),
@@ -176,7 +178,7 @@ export async function answerLegal(req: ChatRequest, signal?: AbortSignal): Promi
     maxOutputTokens: 900,
     abortSignal: signal,
   });
-  return textStreamResponse(guardAnswer(textDeltas(result.stream), DISCLAIMER[lang]), {
+  return textStreamResponse(guardAnswer(await primeDeltas(textDeltas(result.stream)), DISCLAIMER[lang]), {
     trailer: () => trailer,
     onError: (err) => console.error("[/api/chat] stream failed", err),
   });

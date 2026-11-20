@@ -22,7 +22,7 @@ export function ConfirmButton({
   className?: string;
   testId?: string;
 }) {
-  const t = useTranslations("report");
+  const t = useTranslations("common");
   const [asking, setAsking] = useState(false);
   const base = "inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium disabled:opacity-50";
   if (!asking) {

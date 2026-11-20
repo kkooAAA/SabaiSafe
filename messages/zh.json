@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "SabaiSafe",
-    "tagline": "普吉岛游客安全与法律信息"
+    "tagline": "普吉岛游客安全与法律信息",
+    "skipToContent": "跳到主要内容"
   },
   "nav": {
     "label": "主导航",
@@ -101,7 +102,17 @@
       "receipts": "提供收据"
     },
     "checkedOn": "核实日期：{date}",
-    "sampleNotice": "标有“示例数据”的商家为虚构的演示数据。"
+    "sampleNotice": "标有“示例数据”的商家为虚构的演示数据。",
+    "notEndorsement": "列出商家并不代表推荐或担保。我们仅根据公开信息或商家提供的信息核对下列基本标准。“赞助”表示商家付费上榜，不会改变排序或标准。如遇问题，请拨打旅游警察 1155。",
+    "criteriaHelpTitle": "各项标准的含义",
+    "criteriaHelp": {
+      "registered_business": "持有泰国商业登记或旅游营业执照。",
+      "displays_prices": "付款前明示价格，方便您比较。",
+      "written_contract": "租赁：提供英文或中文的书面合同。",
+      "no_passport_deposit": "租赁：不扣押您的护照作为押金。",
+      "insurance": "租赁和活动：包含或可购买保险。",
+      "receipts": "付款时提供收据。"
+    }
   },
   "price": {
     "title": "合理价格",
@@ -147,7 +158,8 @@
       "invalidQuoted": "请输入泰铢金额，例如 1200（留空可查看常见价格范围）。",
       "comparedWith": "对比参考价：",
       "noDataHint": "我们暂无此项的参考价格。如感到被强迫或受骗，可拨打：",
-      "otherCurrency": "请输入泰铢（THB）金额，不要使用人民币或其他货币。"
+      "otherCurrency": "请输入泰铢（THB）金额，不要使用人民币或其他货币。",
+      "retry": "重试"
     },
     "verdict": {
       "within": "在正常范围内",
@@ -163,7 +175,8 @@
     "network": "网络连接有问题，请检查网络后重试。",
     "rate_limited": "请求过多，请稍等一分钟后再试。",
     "unavailable": "此功能暂时无法使用。",
-    "invalid": "请检查您的问题后重试。"
+    "invalid": "请检查您的问题后重试。",
+    "busy": "AI 服务繁忙，请一分钟后再试。"
   },
   "common": {
     "comingSoon": "此功能即将推出。",
@@ -177,7 +190,8 @@
     "call": "拨打",
     "all": "全部",
     "unavailable": "此信息暂时无法获取，请稍后再试。",
-    "draft": "草稿 — 尚未核实"
+    "draft": "草稿 — 尚未核实",
+    "cancel": "取消"
   },
   "legal": {
     "title": "法律指南",
@@ -314,8 +328,100 @@
       "invalid": "请求未被接受。请重试。",
       "incomplete": "回复被中断。请重试。",
       "generic": "出现问题。请重试。",
-      "replace_failed": "无法删除您之前保存的说明，因此这一份未保存。请重试。"
+      "replace_failed": "无法删除您之前保存的说明，因此这一份未保存。请重试。",
+      "busy": "AI 服务繁忙，请一分钟后再试。"
+    }
+  },
+  "admin": {
+    "title": "管理",
+    "intro": "管理参考价格和列出的商家。更改会显示在合理价格和求助页面上。",
+    "tabsLabel": "要管理的数据",
+    "tabs": {
+      "prices": "价格",
+      "businesses": "商家"
     },
-    "cancel": "取消"
+    "search": "搜索",
+    "add": "新增",
+    "edit": "编辑",
+    "delete": "删除",
+    "deactivate": "停用",
+    "save": "保存",
+    "saving": "正在保存…",
+    "cancel": "取消",
+    "back": "返回列表",
+    "retry": "重试",
+    "loading": "正在加载…",
+    "empty": "没有找到内容。",
+    "count": "显示 {count} 条，共 {total} 条",
+    "inactive": "已停用",
+    "confirmDelete": "删除这一行价格？此操作无法撤销。",
+    "confirmDeactivate": "停用这个商家？它将不再显示在求助页面上。",
+    "createTitle": {
+      "prices": "新增价格",
+      "businesses": "新增商家"
+    },
+    "editTitle": {
+      "prices": "编辑价格",
+      "businesses": "编辑商家"
+    },
+    "requiredHint": "带 * 的字段为必填。",
+    "sampleMode": "示例模式：未连接数据库。更改仅保存在内存中，服务器重启后会丢失。",
+    "flash": {
+      "created": "已创建。",
+      "saved": "已保存。",
+      "deleted": "已删除。",
+      "deactivated": "已停用。",
+      "unchanged": "没有需要保存的更改。"
+    },
+    "flashNotPersisted": "（未持久保存：示例模式。）",
+    "field": {
+      "item_key": "项目键（小写，例如 taxi_airport_patong）",
+      "item_name_en": "项目名称（英文）",
+      "item_name_zh": "项目名称（中文）",
+      "category": "类别",
+      "area": "区域",
+      "min_thb": "最低价格（泰铢）",
+      "max_thb": "最高价格（泰铢）",
+      "unit": "单位",
+      "is_fixed_by_law": "价格由法律规定",
+      "source": "来源",
+      "source_url": "来源链接",
+      "collected_at": "采集日期",
+      "notes": "备注（英文）",
+      "notes_zh": "备注（中文）",
+      "is_sample": "示例数据（非真实）",
+      "name": "名称",
+      "name_zh": "名称（中文）",
+      "address": "地址",
+      "phone": "电话",
+      "website": "网站",
+      "google_maps_url": "谷歌地图链接",
+      "description_en": "简介（英文）",
+      "description_zh": "简介（中文）",
+      "criteria_met": "符合的标准",
+      "verified_at": "核实日期",
+      "is_sponsored": "赞助（付费上榜）",
+      "is_active": "启用（在求助页面显示）"
+    },
+    "errors": {
+      "required": "必填。",
+      "number": "请输入数字，例如 1200。",
+      "date": "请输入日期（YYYY-MM-DD）。",
+      "url": "请输入以 https:// 开头的完整链接。",
+      "option": "请选择一个选项。",
+      "min_max": "最高价格不能低于最低价格。",
+      "fixed_needs_source": "法定价格需要来源链接。",
+      "phone_needs_source": "电话号码需要来源链接。",
+      "phone_needs_verified": "电话号码需要核实日期。",
+      "slug": "只能使用小写字母、数字和 _。",
+      "formHasErrors": "请修正标出的字段。",
+      "network": "网络连接有问题，请重试。",
+      "unauthorized": "请重新登录（刷新页面）。",
+      "unavailable": "管理功能不可用：未设置管理员密码，或数据库不可用。",
+      "not_found": "这一行已不存在。请刷新列表。",
+      "conflict": "已存在相同项目、区域、来源和日期的行。",
+      "invalid": "服务器未接受此更改。",
+      "generic": "出现问题，请重试。"
+    }
   }
 }

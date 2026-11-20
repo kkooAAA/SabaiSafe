@@ -51,33 +51,53 @@ const httpUrl = z.string().regex(/^https?:\/\/\S+$/, "must be an http(s) URL");
 const text = z.string().trim().min(1);
 const phone = z.string().regex(PHONE_RE, 'phone must be a short code or "+66 76 123 456" format');
 
-export const PriceRowSchema = z
-  .strictObject({
-    item_key: z.string().regex(/^[a-z0-9]+(_[a-z0-9]+)*$/, "item_key must be snake_case"),
-    item_name_en: text,
-    item_name_zh: text,
-    category: z.enum(PRICE_CATEGORIES),
-    area: z.enum(AREAS),
-    min_thb: z.number().nonnegative(),
-    max_thb: z.number().nonnegative(),
-    unit: z.enum(PRICE_UNITS),
-    is_fixed_by_law: z.boolean(),
-    source: text,
-    source_url: httpUrl.nullable(),
-    collected_at: isoDate,
-    notes: text.nullable(),
-    notes_zh: text.nullable(),
-    is_sample: z.boolean(),
-  })
-  .refine((r) => r.min_thb <= r.max_thb, { message: "min_thb must be <= max_thb", path: ["min_thb"] })
-  .refine((r) => !r.is_fixed_by_law || r.source_url !== null, {
-    message: "is_fixed_by_law=true needs an official source_url",
-    path: ["is_fixed_by_law"],
-  })
-  .refine((r) => r.source !== "SAMPLE DATA" || (r.is_sample && !r.is_fixed_by_law), {
-    message: 'source "SAMPLE DATA" requires is_sample=true and is_fixed_by_law=false',
-    path: ["source"],
-  });
+/** numeric(10,2): at most 2 decimals and below 10^8. */
+const thb = z
+  .number()
+  .nonnegative()
+  .max(99_999_999.99)
+  .refine((n) => Math.abs(n * 100 - Math.round(n * 100)) < 1e-6, "at most 2 decimals");
+
+/** Field rules only (no cross-field rules). `.partial()` of it validates PATCH bodies. */
+export const PriceFields = z.strictObject({
+  item_key: z.string().regex(/^[a-z0-9]+(_[a-z0-9]+)*$/, "item_key must be snake_case"),
+  item_name_en: text,
+  item_name_zh: text,
+  category: z.enum(PRICE_CATEGORIES),
+  area: z.enum(AREAS),
+  min_thb: thb,
+  max_thb: thb,
+  unit: z.enum(PRICE_UNITS),
+  is_fixed_by_law: z.boolean(),
+  source: text,
+  source_url: httpUrl.nullable(),
+  collected_at: isoDate,
+  notes: text.nullable(),
+  notes_zh: text.nullable(),
+  is_sample: z.boolean(),
+});
+
+/**
+ * Cross-field rules, each reported on the field to fix (admin UI). Mirrors the SQL CHECKs (min<=max,
+ * fixed-by-law ⇒ source_url) plus the content rule for "SAMPLE DATA" rows.
+ */
+export const PriceRowSchema = PriceFields.superRefine((r, ctx) => {
+  if (r.min_thb > r.max_thb) ctx.addIssue({ code: "custom", path: ["max_thb"], message: "max_thb must be >= min_thb" });
+  if (r.is_fixed_by_law && r.source_url === null) {
+    ctx.addIssue({ code: "custom", path: ["source_url"], message: "is_fixed_by_law=true needs an official source_url" });
+  }
+  if (r.source === "SAMPLE DATA" && (!r.is_sample || r.is_fixed_by_law)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["is_sample"],
+      message: 'source "SAMPLE DATA" requires is_sample=true and is_fixed_by_law=false',
+    });
+  }
+});
+/** POST /api/admin/prices body (PriceInput). */
+export const PriceInputSchema = PriceRowSchema;
+/** PATCH /api/admin/prices/:id body: any subset of fields; the merged row is re-checked with PriceRowSchema. */
+export const PricePatchSchema = PriceFields.partial();
 
 export const HelpContactSchema = z
   .strictObject({
@@ -106,39 +126,66 @@ export const HelpContactSchema = z
     path: ["verified"],
   });
 
-export const BusinessSchema = z
-  .strictObject({
-    name: text,
-    name_zh: text.nullable(),
-    category: z.enum(BUSINESS_CATEGORIES),
-    area: z.enum(AREAS),
-    address: text.nullable(),
-    phone: phone.nullable(),
-    website: httpUrl.nullable(),
-    google_maps_url: httpUrl.nullable(),
-    source_url: httpUrl.nullable(),
-    description_en: text.nullable(),
-    description_zh: text.nullable(),
-    criteria_met: z.array(z.enum(BUSINESS_CRITERIA)),
-    is_sponsored: z.boolean(),
-    verified_at: isoDate.nullable(),
-    is_active: z.boolean(),
-    is_sample: z.boolean(),
-  })
-  .refine((b) => b.phone === null || (b.source_url !== null && b.verified_at !== null), {
-    message: "a phone number needs source_url and verified_at (else phone must be null)",
-    path: ["phone"],
-  })
-  .refine((b) => !b.is_sample || b.name.startsWith("[SAMPLE] "), {
-    message: 'sample businesses are fictional and their name must start with "[SAMPLE] "',
-    path: ["name"],
-  })
-  .refine((b) => !b.is_sample || (b.phone === null && b.website === null && b.google_maps_url === null), {
-    message: "fictional [SAMPLE] businesses must have phone, website and google_maps_url = null",
-    path: ["phone"],
-  });
+/** Field rules only (no cross-field rules). `.partial()` of it validates PATCH bodies. */
+export const BusinessFields = z.strictObject({
+  name: text,
+  name_zh: text.nullable(),
+  category: z.enum(BUSINESS_CATEGORIES),
+  area: z.enum(AREAS),
+  address: text.nullable(),
+  phone: phone.nullable(),
+  website: httpUrl.nullable(),
+  google_maps_url: httpUrl.nullable(),
+  source_url: httpUrl.nullable(),
+  description_en: text.nullable(),
+  description_zh: text.nullable(),
+  criteria_met: z.array(z.enum(BUSINESS_CRITERIA)),
+  is_sponsored: z.boolean(),
+  verified_at: isoDate.nullable(),
+  is_active: z.boolean(),
+  is_sample: z.boolean(),
+});
+
+/** Cross-field rules, each reported on the field to fix. Phone rule mirrors the SQL CHECK; [SAMPLE] rules are §2.7. */
+export const BusinessSchema = BusinessFields.superRefine((b, ctx) => {
+  if (b.phone !== null && b.source_url === null) {
+    ctx.addIssue({ code: "custom", path: ["source_url"], message: "a phone number needs a source_url (else phone must be null)" });
+  }
+  if (b.phone !== null && b.verified_at === null) {
+    ctx.addIssue({ code: "custom", path: ["verified_at"], message: "a phone number needs verified_at (else phone must be null)" });
+  }
+  if (b.is_sample && !b.name.startsWith("[SAMPLE] ")) {
+    ctx.addIssue({ code: "custom", path: ["name"], message: 'sample businesses are fictional and their name must start with "[SAMPLE] "' });
+  }
+  for (const k of ["phone", "website", "google_maps_url"] as const) {
+    if (b.is_sample && b[k] !== null) {
+      ctx.addIssue({ code: "custom", path: [k], message: `fictional [SAMPLE] businesses must have ${k} = null` });
+    }
+  }
+});
+/** POST /api/admin/businesses body (BusinessInput). */
+export const BusinessInputSchema = BusinessSchema;
+/** PATCH /api/admin/businesses/:id body: any subset of fields; the merged row is re-checked with BusinessSchema. */
+export const BusinessPatchSchema = BusinessFields.partial();
 
 export const HelpJsonSchema = z.strictObject({
   contacts: z.array(z.unknown()),
   businesses: z.array(z.unknown()),
 });
+
+/**
+ * Zod issues → `ApiError.error.fields` (path → first message). Unknown keys → "unknown field";
+ * issues on the whole body use the key "body".
+ */
+export function fieldErrors(err: z.ZodError): Record<string, string> {
+  const out: Record<string, string> = {};
+  const put = (path: PropertyKey[], msg: string) => {
+    const k = path.map(String).join(".") || "body";
+    out[k] ??= msg;
+  };
+  for (const i of err.issues) {
+    if (i.code === "unrecognized_keys") for (const key of i.keys) put([...i.path, key], "unknown field");
+    else put(i.path, i.message);
+  }
+  return out;
+}

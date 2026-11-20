@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ConfirmButton } from "./ConfirmButton";
+import { ConfirmButton } from "@/components/shared/ConfirmButton";
 import { deleteSaved, openSaved, type Summary } from "./report-api";
 import { clearSavedReport, errorKeyFor, type SavedReport } from "./report-state";
 

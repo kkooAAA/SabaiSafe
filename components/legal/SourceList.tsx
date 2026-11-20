@@ -56,7 +56,7 @@ export function SourceList({ sources }: { sources: readonly LegalSource[] }) {
               )}
               {s.excerpt && (
                 <details className="mt-1">
-                  <summary className="cursor-pointer text-xs text-primary">{t("excerpt")}</summary>
+                  <summary className="flex min-h-11 cursor-pointer items-center text-xs text-primary">{t("excerpt")}</summary>
                   <p className="mt-1 text-xs whitespace-pre-line [overflow-wrap:anywhere]">{s.excerpt}</p>
                 </details>
               )}
@@ -66,7 +66,7 @@ export function SourceList({ sources }: { sources: readonly LegalSource[] }) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-8 items-center gap-1 text-primary underline underline-offset-2"
+                    className="inline-flex min-h-11 items-center gap-1 text-primary underline underline-offset-2"
                   >
                     {t("openSource")}
                     <ExternalLink className="size-3" aria-hidden />

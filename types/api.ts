@@ -12,7 +12,8 @@ import {
 export const UiLang = z.enum(["en", "zh"]);
 export type UiLang = z.infer<typeof UiLang>;
 
-export type ApiError = { error: { code: string; message: string } };
+/** fields: validation errors keyed by field path ("min_thb", "criteria_met.2"), admin routes only. */
+export type ApiError = { error: { code: string; message: string; fields?: Record<string, string> } };
 
 export const ChatMessage = z.object({
   role: z.enum(["user", "assistant"]),
@@ -220,3 +221,10 @@ export type Business = {
 };
 
 export type HelpResponse = { contacts: HelpContact[]; businesses: Business[] };
+
+// ---------- Admin (§3.9, Phase 4) ----------
+export type PriceInput = Omit<PriceRef, "id">;
+export type BusinessInput = Omit<Business, "id">;
+/** persisted=false ⇒ sample-mode in-memory overlay, lost on restart (also header X-Admin-Persisted). */
+export type AdminListResponse<T> = { results: T[]; persisted: boolean };
+export type AdminWriteResponse<T> = { row: T; persisted: boolean };

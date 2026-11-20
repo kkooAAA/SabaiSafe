@@ -8,7 +8,7 @@ import type { UiLang } from "@/types/api";
 import { HOTLINES } from "@/lib/hotlines";
 import { HotlineLink } from "@/components/shared/HotlineLink";
 import { pickLang } from "@/components/shared/format";
-import { postTextStream } from "@/components/shared/text-stream";
+import { aiErrorKey, postTextStream } from "@/components/shared/text-stream";
 import { EmergencyBanner } from "./EmergencyBanner";
 import { SourceList } from "./SourceList";
 import { linkCitations, looksUrgent, parseLegalStream, stripDisclaimer, type LegalParse } from "./parse";
@@ -59,7 +59,7 @@ export function LegalGuide() {
       );
       if (ac.signal.aborted) return;
       if (!r.ok) {
-        setErrorKey(ERROR_KEYS.includes(r.code) ? r.code : r.status === 400 ? "invalid" : "generic");
+        setErrorKey(aiErrorKey(r.status, r.code) ?? (ERROR_KEYS.includes(r.code) ? r.code : r.status === 400 ? "invalid" : "generic"));
         setStatus("error");
         return;
       }
@@ -186,7 +186,7 @@ export function LegalGuide() {
         </section>
       )}
 
-      <div ref={answerRef} className="scroll-mt-28 space-y-4" aria-busy={loading || undefined}>
+      <div ref={answerRef} className="scroll-mt-28 space-y-4" aria-live="polite" aria-busy={loading || undefined}>
         {asked && (
           <p className="rounded-lg bg-muted px-3 py-2 text-sm [overflow-wrap:anywhere]">
             <span className="sr-only">{t("yourQuestion")}: </span>
@@ -254,7 +254,7 @@ export function LegalGuide() {
               <button
                 type="button"
                 onClick={() => void ask(asked)}
-                className="h-10 rounded-md border bg-background px-4 text-sm font-medium"
+                className="h-11 rounded-md border bg-background px-4 text-sm font-medium"
               >
                 {t("retry")}
               </button>

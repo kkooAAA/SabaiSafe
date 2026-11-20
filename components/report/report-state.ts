@@ -150,7 +150,11 @@ export function errorKeyFor(action: ReportAction, status: number, code?: string 
   if (code === "consent_required") return "consent_required";
   if (code === "consent_outdated") return "consent_outdated";
   if (status === 404 || code === "not_found") return action === "open" || action === "delete" ? "not_found" : "generic";
-  if (status === 503 || code === "unavailable") return action === "save" ? "save_unavailable" : "unavailable";
+  if (status === 503 || code === "unavailable") {
+    if (action === "save") return "save_unavailable";
+    // AI routes: provider busy / out of quota.
+    return action === "chat" || action === "generate" ? "busy" : "unavailable";
+  }
   if (status === 400) return action === "chat" || action === "generate" ? "too_long_or_invalid" : "invalid";
   return "generic";
 }

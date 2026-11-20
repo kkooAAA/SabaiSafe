@@ -4,7 +4,7 @@ import { getHelp } from "@/lib/db/help";
 import type { HelpResponse } from "@/types/api";
 import { HotlineList } from "@/components/help/HotlineList";
 import { ContactDirectory } from "@/components/help/ContactDirectory";
-import { BusinessCard } from "@/components/help/BusinessCard";
+import { BusinessDirectory } from "@/components/help/BusinessDirectory";
 import { mergeContacts } from "@/components/help/merge-contacts";
 
 export const revalidate = 300;
@@ -54,23 +54,7 @@ export default async function HelpPage({ params }: Props) {
         <>
           {hasSample && <p className="text-xs text-muted-foreground">{t("sampleNotice")}</p>}
           <ContactDirectory contacts={contacts} categories={categories} />
-          <section aria-labelledby="biz-h" className="space-y-3">
-            <h2 id="biz-h" className="text-lg font-semibold">
-              {t("businessesTitle")}
-            </h2>
-            <p className="text-sm text-muted-foreground">{t("businessesNote")}</p>
-            {businesses.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("noBusinesses")}</p>
-            ) : (
-              <ul className="grid gap-3">
-                {businesses.map((b) => (
-                  <li key={b.id}>
-                    <BusinessCard business={b} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <BusinessDirectory businesses={businesses} />
         </>
       )}
     </div>

@@ -13,7 +13,7 @@ export async function POST(req: Request): Promise<Response> {
     return jsonError(400, "bad_request", "messages: the first and last message must be from the user.");
   }
   try {
-    return interviewResponse(body.data.messages, body.data.lang, req.signal);
+    return await interviewResponse(body.data.messages, body.data.lang, req.signal);
   } catch (err) {
     return errorResponse(err);
   }

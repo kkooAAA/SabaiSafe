@@ -2,6 +2,78 @@
 
 Newest first. One short entry per finished task: date, teammate, what changed, how it was checked.
 
+## 2026-11-21 — frontend — P4-1 Trusted Services, P4-3 Admin UI, P4-4 polish/a11y (review, handed to qa)
+- P4-1 (/help#trusted, `components/help/BusinessDirectory.tsx`): order by `name` only via `orderBusinesses`
+  (en collation, base sensitivity, id tiebreak; sponsorship never reorders; inactive dropped), category chips,
+  translated criteria chips (`metCriteria`), Sponsored + Sample labels, "not an endorsement" note, and a
+  "What the criteria mean" legend for all 6 BUSINESS_CRITERIA. Pure helpers: `components/help/trusted.ts`.
+- P4-3 (/[locale]/admin, noindex; HTTP Basic in middleware): Prices | Businesses tabs, search, list cards, create/edit
+  form (all row fields; selects for category/unit, checkboxes for criteria, area suggestions), delete (prices) /
+  deactivate (businesses) with an inline confirm. Client checks mirror backend's schema (required, number, date,
+  http(s) URL, min ≤ max, fixed-by-law ⇒ source_url, phone ⇒ source_url + verified_at, item_key slug); server
+  `fields` errors are shown under the field (non-column keys in the form error box). Sample-mode banner from
+  `X-Admin-Persisted` / `persisted` (also on 204). PATCH sends only changed fields. Pure helpers:
+  `components/admin/admin-form.ts`; `adminErrorKey` in AdminConsole.tsx. ConfirmButton moved to components/shared.
+- P4-4: skip link + `<main id="main">`; `aria-live`/`aria-busy` on all streamed answers (Legal, Price, Report);
+  Retry buttons, source "Excerpt" toggles raised to 44 px; citation chips get a ~37×44 invisible hit area (inline
+  in text). Favicon: lead's next.config rewrite (200).
+- Checked: typecheck, lint, test (41 files / 1251). `next build` + `next start` copy (mock, ADMIN_PASSWORD set),
+  headless Chrome 375 px en + zh: admin flow 43/43 (401 without auth, list, search, client + server field errors,
+  create/edit/delete price, create business → shown on /help with Sponsored, deactivate → Inactive, sample banner,
+  noindex); audit of 22 page/states (/, legal, report, price, help, admin + their after-interaction states):
+  scrollWidth 375, all controls ≥ 44 px (except the hidden skip link and inline citations), no unlabeled controls,
+  no nameless buttons/links, no text below WCAG AA contrast, no duplicate ids, no raw keys, no console errors.
+  Regression: report 72/72, AI-busy 18/18.
+  NOT checked: real Supabase admin writes; screen reader pass (structure only); keyboard-only walk-through by hand.
+
+## 2026-11-21 — backend — P4-2 admin API + next-dev report store fix (done, qa approved)
+- `/api/admin/{prices,businesses}` GET/POST and `/:id` PATCH/DELETE per contracts §3.9 v0.6 (`lib/db/admin.ts`,
+  routes + `app/api/admin/shared.ts`). Bodies are checked with the loader/seed schemas (`lib/db/schema.ts`, now split
+  into `*Fields` + cross-field rules reported on the field to fix; `fieldErrors()` → `ApiError.fields`). Strict: unknown
+  keys, id and timestamps → 400. PATCH = merge + full re-check. Price DELETE is hard (204); business DELETE is soft
+  (200, `is_active=false`, not re-validated). 404 for an unknown/non-uuid id, 409 `conflict` on the unique keys. Postgres
+  codes are mapped (23505 → 409, CHECK/NOT NULL → 400), and raw text is never returned. Every admin response is `no-store`
+  + `X-Admin-Persisted`.
+- Sample mode: an in-memory overlay on `globalThis.__sabaisafeAdmin` (lost on restart, `persisted:false`) that
+  findPrices/getHelp read, so the public routes and pages see edits. Price/help 60 s caches moved to globalThis and are
+  cleared on every write, and writes `revalidatePath` `/[locale]/price` and `/[locale]/help`. `/api/price` and `/api/help`
+  now send `s-maxage=60, stale-while-revalidate=60`.
+- Fix: `lib/db/reports.ts` in-memory store moved to `globalThis.__sabaisafeReports`, so under `next dev`
+  save → GET no longer gives 404.
+- Checked: typecheck, lint (0 problems), test 41 files / 1251 incl. qa's api-admin (95), api-admin-errors (10) and
+  middleware-admin (84). `next dev` smoke in a copy, sample mode, ADMIN_PASSWORD set, 30/30: 401 without/with a wrong
+  password; CRUD on both resources; 400 fields (min/max, unknown key, bad JSON, fixed-by-law, criteria, phone rule); 409;
+  404; soft delete hidden from /api/help but listed in admin; overlay visible to /api/price and /api/help (separate
+  bundles); report save → GET 200.
+  NOT checked: DB mode (no Supabase or Docker locally; that path is type-checked and reviewed only); revalidatePath on a
+  real ISR build. No new migration.
+
+## 2026-11-20 — frontend — "AI busy" on 503 for all three AI features
+- New pure helper `aiErrorKey(status, code)` in `components/shared/text-stream.ts` (503/unavailable → `busy`, 429 →
+  `rate_limited`); new messages `errors.busy`, `report.errors.busy`, `price.check.retry` (en + zh).
+- Legal Guide: 503 → "The AI service is busy. Please try again in a minute."; existing Retry resends the kept question.
+  Fair Price check: same message plus a new Retry (resubmits the form; item/area/unit/quote kept). Report: `errorKeyFor`
+  chat/generate 503 → `busy` (save keeps `save_unavailable`, open/delete keep `unavailable`); chat Retry resends the kept
+  conversation; new Retry next to a generate error.
+- Checked: typecheck, lint, test (37 files / 1048). `next start` copy (mock), headless Chrome 375 px en + zh 18/18: UPSTREAMBUSY
+  on /api/chat and /api/report/chat (real mock trigger), intercepted 503 on /api/report/generate and /api/chat/price (no
+  free-text field reaches the price route); busy text + Retry shown, input/conversation kept, Retry succeeds once the
+  503 clears; scrollWidth 375, no console errors.
+
+## 2026-11-20 — ai — Google Gemini provider (contracts v0.5; live verification handed to lead)
+- `lib/ai/provider.ts`: `AI_PROVIDER=google` (chat `gemini-3.5-flash`, fast `gemini-3.5-flash-lite`; 2.5-pro/2.5-flash
+  404 for new users, 3.1-pro-preview 429 on the free tier, 3.8-flash 503 "high demand"); `EMBEDDING_PROVIDER`
+  (default google iff AI_PROVIDER=google); gemini-embedding-001 @1536 with RETRIEVAL_DOCUMENT / RETRIEVAL_QUERY,
+  L2-normalized; `embeddingModelId()`; key check per embedding provider; free-tier pacing (batches of 50,
+  `GOOGLE_EMBED_PER_MIN` default 90 texts per rolling minute); `modelCallOptions()` = minimal Gemini thinking on
+  every call.
+- Ingest folds the embedding model id into `content_hash` (switching providers re-embeds); the sample index is cached
+  per model id; `minSimilarity(embeddingModelId)` = google 0.62 / openai + mock 0.30, `LEGAL_MIN_SIMILARITY` overrides.
+- Checked: typecheck, lint, test (36 files / 1005, incl. qa's no-network provider tests); live with the key (sample
+  mode): models.list, embeddings + similarity probe (in-scope top 0.66–0.80, off-topic 0.54–0.57).
+  NOT verified live (paused at the lead's request to share the free quota): a clean /api/chat answer (one run
+  returned planning fragments; minimal thinking added afterwards, untested), /api/chat/price, report flow.
+
 ## 2026-11-20 — ai — P3-1 report chat/generate, P3-2 PDF/save/get/delete (done, qa approved)
 - `lib/ai/report.ts`: every message scrubPII'd before the model; interview = reportInterviewSystem → guardAnswer →
   ready-mode stream (`\n[READY]` only as final bytes); generate = transcript → REPORT_EXTRACT_SYSTEM (fast, temp 0,

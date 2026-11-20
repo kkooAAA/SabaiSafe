@@ -12,7 +12,7 @@ If this doc and `types/api.ts` disagree, raise it with the lead; don't silently 
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | lib/db | Empty URL ⇒ **sample mode**: lib/db serves in-memory data loaded from `content/prices.csv` and `content/help.json`; `matchLegal` returns nothing, and ai's `/api/chat` searches `content/legal` in memory instead (`lib/ai/legal-index.ts`). |
 | `SUPABASE_SERVICE_ROLE_KEY` | server only | ingest, report storage, admin writes. Never imported from client code. |
-| `AI_PROVIDER` | lib/ai | `anthropic` \| `openai` \| `mock`. `mock` returns deterministic canned output and a fake embedding; tests and CI always use it. |
+| `AI_PROVIDER` | lib/ai | `anthropic` \| `openai` \| `google` \| `mock`. `mock` returns deterministic canned output and a fake embedding; tests and CI always use it. |
 | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | lib/ai | OpenAI key is needed for embeddings in any non-mock mode. |
 | `AI_MODEL_CHAT`, `AI_MODEL_FAST` | lib/ai | Optional overrides. FAST = query rewrite, router, extraction. |
 | `ADMIN_PASSWORD` | middleware | HTTP Basic, user `admin`, guards `/{locale}/admin` and `/api/admin/*`. Unset ⇒ admin returns 503. |
@@ -47,7 +47,7 @@ RLS **enabled**. The anon role may only `select` from `prices`, `businesses` (wh
 | heading | text null | the H2 the chunk came from |
 | content | text not null | chunk text, prefixed by title + heading for better embeddings |
 | content_hash | text not null | sha256 of content **plus** the frontmatter fields status, section, law, law_th, source_url, location, topic (so DRAFT→VERIFIED is picked up); ingest skips re-embedding when unchanged |
-| embedding | vector(1536) not null | OpenAI `text-embedding-3-small` |
+| embedding | vector(1536) not null | OpenAI `text-embedding-3-small`, or Google `gemini-embedding-001` (outputDimensionality 1536) per `EMBEDDING_PROVIDER` |
 
 `unique (doc_slug, lang, chunk_index)`; HNSW index on `embedding vector_cosine_ops`; btree on `lang`.
 
@@ -123,11 +123,13 @@ Sample businesses are fictional and their names start with `[SAMPLE]`.
 
 All request bodies are JSON and are validated with the zod schemas in `types/api.ts`. Errors are always
 `{ "error": { "code": string, "message": string } }`. Codes: 400 `bad_request` / `consent_required` /
-`consent_outdated`, 401 `unauthorized` (middleware), 404 `not_found`, 429 `rate_limited` (middleware), 500 `internal`,
+`consent_outdated`, 401 `unauthorized` (middleware), 404 `not_found`, 409 `conflict` (admin unique key), 429 `rate_limited` (middleware), 500 `internal`,
 503 `unavailable` (missing key or DB). Every route sets `export const runtime = "nodejs"`.
 
 **Streamed routes** (`/api/chat`, `/api/report/chat`, `/api/chat/price`) are `text/plain; charset=utf-8`. If the model
 fails after streaming starts, the server appends `ERROR_MARKER` (`types/api.ts`) and closes; nothing follows it.
+The server waits for the model's first text delta before responding: a failure BEFORE it returns a JSON error
+(503 `unavailable` when the provider is busy or out of quota, never with upstream details), not 200 + `ERROR_MARKER`.
 The server strips `\u001e` from model text. Clients render only the text before the first `\n\u001e`.
 
 ### 3.1 `POST /api/chat` — Legal Guide (owner: ai)
@@ -221,6 +223,15 @@ from `GET /api/price`. No refs ⇒ "Not enough data".
 `GET/POST /api/admin/prices`, `PATCH/DELETE /api/admin/prices/:id`, and the same for `/api/admin/businesses`.
 Bodies are the row types without `id`/timestamps. Uses the service-role client. Auth is in middleware.
 (`DELETE` is a soft delete for businesses: `is_active = false`.)
+Responses (all `Cache-Control: no-store`): GET → `AdminListResponse<T>` (prices: all rows ordered category,
+item_name_en, area; businesses: incl. inactive, ordered by `name`); POST → 201 `AdminWriteResponse<T>` (`{row, persisted}`); PATCH (partial,
+≥1 field, merged then fully re-validated) → 200 `AdminWriteResponse<T>`; DELETE price → 204 (hard); DELETE business →
+200 `AdminWriteResponse<Business>` with `is_active=false`. Errors: 400 `bad_request` with `fields: Record<path, message>`
+(also for unknown keys incl. id/timestamps), 404 `not_found` (also a non-uuid id), 409 `conflict` (unique key), 503 `unavailable`, 500 `internal`. Sample mode: writes go to an in-memory
+overlay on `globalThis` (lost on restart) that `/api/price`, `/api/help` and the pages read; every admin response has
+`persisted: false` and header `X-Admin-Persisted: false` (true with Supabase). Public `/api/price` and `/api/help` use
+`s-maxage=60, stale-while-revalidate=60` so admin edits show within about two minutes; writes also
+`revalidatePath` the ISR pages `/[locale]/price` and `/[locale]/help`.
 
 ## 4. Server-side module boundaries
 
@@ -283,6 +294,9 @@ citation presence, disclaimer presence, and no invented phone numbers.
 Mock triggers (ai, agreed with qa): emergency keywords ⇒ `is_emergency`; `NOANSWER` ⇒ no-answer path; `BADJSON` ⇒
 first extraction fails, retry succeeds; `BADJSON2` ⇒ both fail (500); `STREAMERROR` ⇒ stream ends with `ERROR_MARKER`;
 last user message `yes`/`是` ⇒ reply ends with `\n[READY]`; extraction echoes user text (to test scrubbing).
+`UPSTREAMBUSY` ⇒ model fails before any output with a non-retryable 429 (daily-quota body), so `/api/chat`,
+`/api/chat/price`, `/api/report/chat` and `/api/report/generate` answer JSON 503 `unavailable` with no stream.
+Env (google): `AI_MODEL_FALLBACK` (one-shot fallback model), `AI_DEBUG=1` (one timing line per Google HTTP call).
 
 ## 8. Dependencies
 
@@ -309,3 +323,16 @@ badge, tabs, select, input, sheet, separator, skeleton, alert), clsx, tailwind-m
   unchanged) so client components can import them without zod.
   `POST /api/report/generate`: `messages[0]` must be `user`; the last message MAY be `assistant` (the client sends the
   whole conversation, ending with the `[READY]` read-back reply), same size limits as `Conversation`.
+- v0.5 (2026-11-20, lead, user-approved): Google provider. `AI_PROVIDER=google` (Gemini via `@ai-sdk/google`, key
+  `GOOGLE_GENERATIVE_AI_API_KEY`); new `EMBEDDING_PROVIDER` = `openai` | `google` (default `google` when
+  `AI_PROVIDER=google`, else `openai`). Google embeddings: `gemini-embedding-001`, outputDimensionality 1536, task type
+  RETRIEVAL_DOCUMENT for ingest and RETRIEVAL_QUERY for questions, so the DB schema and `match_legal` are unchanged.
+  The embedding model id is part of the ingest content_hash, so switching providers re-embeds everything.
+  Google defaults (free key, 2026-11-20): chat `gemini-3.5-flash`, fast `gemini-3.5-flash-lite`. `LEGAL_MIN_SIMILARITY`
+  default is per embedding model (openai/mock 0.30, google 0.62); a set value overrides it. New `GOOGLE_EMBED_PER_MIN`
+  (default 90, min 50) paces Google embeddings; in sample mode the first legal question after a start waits ~60-70 s.
+  Google calls fail fast (maxRetries 0 for chat/fast, 1 for embeddings) and fall back once to `AI_MODEL_FALLBACK`
+  on 429/503 before any output; an upstream 429/503 maps to 503 `unavailable`. `AI_DEBUG=1` logs per-call timing.
+- v0.6 (Phase 4, 2026-11-21, lead): admin shapes in §3.9 (`AdminListResponse`, `AdminWriteResponse`, `PriceInput`,
+  `BusinessInput`); optional `fields: Record<string, string>` on `ApiError`; new error code `conflict` (409); public price/help
+  `s-maxage` 300 → 60.

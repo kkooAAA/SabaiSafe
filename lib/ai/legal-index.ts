@@ -1,11 +1,11 @@
 // In-memory legal search for sample mode (no Supabase, contracts §1). lib/db's matchLegal returns [] in sample
 // mode, so the Legal Guide searches content/legal directly: the same chunks ingest would store (legal-content.ts),
-// embedded with the active provider (mock embeddings in tests/CI, OpenAI when a key is set), ranked by cosine
+// embedded with the active embedding provider (mock in tests/CI, else EMBEDDING_PROVIDER), ranked by cosine
 // similarity like match_legal. Built once per process and cached.
 import type { UiLang } from "@/types/api";
 import type { LegalMatchRow } from "@/types/db";
 import { chunkDoc, legalContentDir, loadLegalDocs, type LegalChunk } from "./legal-content";
-import { aiProvider, embedMany } from "./provider";
+import { embedMany, embeddingModelId } from "./provider";
 
 type Index = { chunks: LegalChunk[]; embeddings: number[][] };
 
@@ -13,13 +13,17 @@ const cache = new Map<string, Promise<Index>>();
 
 async function build(dir: string): Promise<Index> {
   const chunks = loadLegalDocs(dir).flatMap(chunkDoc);
-  const embeddings = await embedMany(chunks.map((c) => c.content));
+  const embeddings = await embedMany(
+    chunks.map((c) => c.content),
+    { task: "document" },
+  );
   return { chunks, embeddings };
 }
 
 function getIndex(): Promise<Index> {
   const dir = legalContentDir();
-  const key = `${aiProvider()}|${dir}`;
+  // Keyed by vector space: an index built with one embedding model is never queried with another's vectors.
+  const key = `${embeddingModelId()}|${dir}`;
   let p = cache.get(key);
   if (!p) {
     p = build(dir);

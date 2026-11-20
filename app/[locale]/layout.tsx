@@ -34,7 +34,7 @@ export default async function LocaleLayout({
       <body className="min-h-dvh font-sans">
         <NextIntlClientProvider>
           <Header />
-          <main className="mx-auto w-full max-w-md px-4 pb-24 pt-4">{children}</main>
+          <main id="main" tabIndex={-1} className="mx-auto w-full max-w-md px-4 pb-24 pt-4 focus:outline-none">{children}</main>
           <BottomNav />
         </NextIntlClientProvider>
       </body>

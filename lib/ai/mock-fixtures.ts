@@ -7,6 +7,8 @@ export const MOCK_TRIGGERS = {
   badJsonOnce: "BADJSON",
   badJsonAlways: "BADJSON2",
   streamError: "STREAMERROR",
+  /** The model call fails BEFORE any output with an upstream 429 (as when the Gemini quota is used up). */
+  upstreamBusy: "UPSTREAMBUSY",
 } as const;
 
 export const MOCK_EMERGENCY_RE = /emergency|hurt|injur|attack|assault|danger|bleed|救命|受伤|危险/i;

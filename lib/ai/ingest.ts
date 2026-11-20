@@ -4,7 +4,8 @@
 import type { UiLang } from "@/types/api";
 import type { LegalChunkInsert } from "@/types/db";
 import { chunkDoc, loadLegalDocs, type LegalChunk, type LegalDoc } from "./legal-content";
-import { EMBEDDING_DIMS, embedMany as providerEmbedMany, mockEmbedding } from "./provider";
+import { createHash } from "node:crypto";
+import { EMBEDDING_DIMS, embedMany as providerEmbedMany, embeddingModelId, mockEmbedding } from "./provider";
 
 /** What ingest needs from lib/db/legal.ts (backend). */
 export type IngestStore = {
@@ -25,6 +26,8 @@ export type IngestOptions = {
   store?: IngestStore;
   /** Defaults to provider.ts#embedMany (real or mock per AI_PROVIDER); dry-run always uses mock embeddings. */
   embedMany?: (texts: string[]) => Promise<number[][]>;
+  /** Vector space id folded into content_hash. Defaults to provider.ts#embeddingModelId(). */
+  embeddingModelId?: string;
   log?: (line: string) => void;
 };
 
@@ -49,6 +52,14 @@ function unpairedSlugs(docs: LegalDoc[]): string[] {
   const langsBySlug = new Map<string, Set<UiLang>>();
   for (const d of docs) langsBySlug.set(d.slug, (langsBySlug.get(d.slug) ?? new Set()).add(d.lang));
   return [...langsBySlug].filter(([, ls]) => ls.size < 2).map(([s, ls]) => `${s} (${[...ls].join(",")} only)`);
+}
+
+/**
+ * The stored content_hash = sha256(chunk hash, embedding model id). Switching EMBEDDING_PROVIDER (or the model)
+ * changes every hash, so the next ingest re-embeds every chunk and vectors from two models never mix.
+ */
+export function hashWithEmbeddingModel(contentHash: string, modelId: string): string {
+  return createHash("sha256").update(contentHash).update(String.fromCharCode(0)).update(modelId).digest("hex");
 }
 
 async function embedAll(texts: string[], embedMany: (t: string[]) => Promise<number[][]>): Promise<number[][]> {
@@ -87,7 +98,10 @@ export async function runIngest(opts: IngestOptions): Promise<IngestReport> {
 
   const store = opts.store;
   if (!store) throw new Error("runIngest: a store is required unless dryRun is set");
-  const embedMany = opts.embedMany ?? providerEmbedMany;
+  const embedMany = opts.embedMany ?? ((t: string[]) => providerEmbedMany(t, { task: "document" }));
+  const modelId = opts.embeddingModelId ?? embeddingModelId();
+  for (const c of chunks) c.content_hash = hashWithEmbeddingModel(c.content_hash, modelId);
+  log(`embedding model: ${modelId}`);
 
   const existing = await store.getChunkHashes();
   const changed = chunks.filter((c) => opts.force || existing.get(key(c)) !== c.content_hash);

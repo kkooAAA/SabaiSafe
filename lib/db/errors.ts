@@ -25,3 +25,22 @@ export class SampleDataError extends Error {
     this.where = where;
   }
 }
+
+/** An admin body failed validation. `fields` = path → message (ApiError.error.fields). Maps to 400 bad_request. */
+export class ValidationError extends Error {
+  constructor(
+    readonly fields: Record<string, string>,
+    message = "Invalid fields.",
+  ) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
+/** A unique key is already taken. Maps to 409 conflict. */
+export class ConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConflictError";
+  }
+}

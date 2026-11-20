@@ -16,7 +16,7 @@ export async function GET(req: Request): Promise<Response> {
 
   try {
     const body: HelpResponse = await getHelp({ category: category?.data });
-    return Response.json(body, { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" } });
+    return Response.json(body, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=60" } });
   } catch (err) {
     return dbErrorResponse(err);
   }

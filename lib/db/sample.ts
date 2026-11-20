@@ -187,3 +187,33 @@ export function getSampleData(): SampleData {
 export function resetSampleCache(): void {
   cache = null;
 }
+
+// ---------------------------------------------------------------- admin overlay (sample mode)
+// Admin writes in sample mode go to an in-memory copy of the sample prices and businesses (demo only, lost on
+// restart). It lives on globalThis because `next dev` gives every route its own copy of this module, and
+// /api/admin/*, /api/price, /api/help and the pages must all see the same data. Contacts are never edited.
+
+export type SampleOverlay = { prices: PriceRef[]; businesses: Business[] };
+
+declare global {
+  var __sabaisafeAdmin: SampleOverlay | undefined;
+}
+
+/** The overlay if an admin write created one, else undefined (read the sample data instead). */
+export function sampleOverlay(): SampleOverlay | undefined {
+  return globalThis.__sabaisafeAdmin;
+}
+
+/** The overlay, created from the sample data on first use. */
+export function ensureSampleOverlay(): SampleOverlay {
+  if (!globalThis.__sabaisafeAdmin) {
+    const d = getSampleData();
+    globalThis.__sabaisafeAdmin = structuredClone({ prices: d.prices, businesses: d.businesses });
+  }
+  return globalThis.__sabaisafeAdmin;
+}
+
+/** Tests only: drop admin edits made in sample mode. */
+export function resetAdminOverlay(): void {
+  globalThis.__sabaisafeAdmin = undefined;
+}

@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { execFileSync } from "node:child_process";
 
 const ROOT = process.cwd();
 const SKIP = new Set(["node_modules", ".next", ".git", "coverage", "tests", "evals"]);
@@ -46,6 +47,21 @@ describe("repo safety", () => {
     expect(bad.map(rel)).toEqual([]);
   });
 
+  it("the admin page is not linked from public code (nav, header, home, footer, any page)", () => {
+    const isAdminCode = (f: string) => /^(components\/admin\/|app\/\[locale\]\/admin\/|app\/api\/admin\/)/.test(rel(f));
+    const bad = files
+      .filter((f) => /^(app|components)\//.test(rel(f)) && !isAdminCode(f))
+      .filter((f) => /["'`](\/(en|zh|\$\{[^}]+\}))?\/admin["'`/?#]/.test(src(f)) || /href=\{?["'`][^"'`]*\/admin\b/.test(src(f)));
+    expect(bad.map(rel)).toEqual([]);
+  });
+
+  it("the admin page sets robots noindex, and next.config adds X-Robots-Tag for admin pages and API", () => {
+    expect(src(join(ROOT, "app", "[locale]", "admin", "page.tsx"))).toMatch(/robots:\s*\{\s*index:\s*false,\s*follow:\s*false/);
+    const cfg = src(join(ROOT, "next.config.ts"));
+    expect(cfg).toMatch(/X-Robots-Tag[\s\S]*noindex/);
+    expect(cfg).toContain("/api/admin/:path*");
+  });
+
   it("the report routes exist and set runtime = nodejs", () => {
     for (const r of ["chat", "generate", "pdf", "save", "[id]"]) {
       const p = join(ROOT, "app", "api", "report", r, "route.ts");
@@ -67,7 +83,7 @@ describe("repo safety", () => {
 
   it("no secret is ever exposed through a NEXT_PUBLIC_ name", () => {
     const bad = files.flatMap((f) =>
-      [...src(f).matchAll(/NEXT_PUBLIC_[A-Z0-9_]*(SERVICE_ROLE|SECRET|API_KEY|PASSWORD|OPENAI|ANTHROPIC)[A-Z0-9_]*/g)].map(
+      [...src(f).matchAll(/NEXT_PUBLIC_[A-Z0-9_]*(SERVICE_ROLE|SECRET|API_KEY|PASSWORD|OPENAI|ANTHROPIC|GOOGLE_GENERATIVE|GEMINI)[A-Z0-9_]*/g)].map(
         (m) => `${rel(f)}: ${m[0]}`,
       ),
     );
@@ -75,8 +91,33 @@ describe("repo safety", () => {
   });
 
   it("no hard-coded API keys", () => {
-    const bad = files.filter((f) => /\b(sk-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|eyJhbGciOi[A-Za-z0-9._-]{40,})/.test(src(f)));
+    const bad = files.filter((f) => /\b(sk-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{35}|eyJhbGciOi[A-Za-z0-9._-]{40,})/.test(src(f)));
     expect(bad.map(rel)).toEqual([]);
+  });
+
+  it("no committable file assigns a value to a secret env var (format-independent; .env/.env*.local are ignored)", () => {
+    // Every file git would commit (tracked + untracked-not-ignored), any extension. Catches keys of any prefix.
+    const committable = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: ROOT, encoding: "utf8" })
+      .split("\0")
+      .filter((f) => f && !f.startsWith("node_modules/") && existsSync(join(ROOT, f)) && statSync(join(ROOT, f)).isFile());
+    const SECRET_ASSIGN =
+      /^\s*(?:export\s+)?(GOOGLE_GENERATIVE_AI_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|SUPABASE_SERVICE_ROLE_KEY|ADMIN_PASSWORD)\s*[=:]\s*["']?([^\s"'#]+)/gm;
+    const bad: string[] = [];
+    for (const f of committable) {
+      if (statSync(join(ROOT, f)).size > 2_000_000) continue;
+      const text = readFileSync(join(ROOT, f), "utf8");
+      for (const m of text.matchAll(SECRET_ASSIGN)) {
+        const value = m[2] ?? "";
+        // Placeholders and env references are fine; a literal value is not.
+        if (/^(\$\{?|<|your[-_]|changeme$|xxx|\.\.\.|test-not-a-real-key$|\$\{\{)/i.test(value)) continue;
+        bad.push(`${f}: ${m[1]}`); // never print the value
+      }
+    }
+    expect(bad).toEqual([]);
+    // the ignore rules that keep real keys out stay in place
+    const gi = readFileSync(join(ROOT, ".gitignore"), "utf8");
+    expect(gi).toMatch(/^\.env$/m);
+    expect(gi).toMatch(/^\.env\*\.local$/m);
   });
 
   it("SUPABASE_SERVICE_ROLE_KEY is read only inside lib/db (no server-only package, so keep the surface tiny)", () => {
@@ -85,7 +126,7 @@ describe("repo safety", () => {
   });
 
   it("LLM keys are read only inside lib/ai", () => {
-    const bad = files.filter((f) => !rel(f).startsWith("lib/ai/") && /(OPENAI|ANTHROPIC)_API_KEY/.test(src(f)));
+    const bad = files.filter((f) => !rel(f).startsWith("lib/ai/") && /(OPENAI_API_KEY|ANTHROPIC_API_KEY|GOOGLE_GENERATIVE_AI_API_KEY)/.test(src(f)));
     expect(bad.map(rel)).toEqual([]);
   });
 

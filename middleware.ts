@@ -15,8 +15,22 @@ export function clientIp(req: Request) {
   );
 }
 
+/** Expects a DECODED path (see decodePath). Case-insensitive and tolerant of repeated slashes, as defence in depth. */
 export function isAdminPath(pathname: string) {
-  return /^\/api\/admin(\/|$)/.test(pathname) || /^\/(en|zh)\/admin(\/|$)/.test(pathname);
+  const p = pathname.replace(/\/{2,}/g, "/");
+  return /^\/api\/admin(\/|$)/i.test(p) || /^\/(en|zh)\/admin(\/|$)/i.test(p);
+}
+
+/**
+ * Next decodes percent-escapes before routing (/%65n/%61dmin is served by /en/admin), so every path check must run
+ * on the decoded path. Returns null for a malformed escape.
+ */
+export function decodePath(pathname: string): string | null {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return null;
+  }
 }
 
 export function envLimit(value: string | undefined, fallback: number) {
@@ -65,20 +79,22 @@ function checkAdmin(req: NextRequest, isApi: boolean): NextResponse | null {
   if (creds) rateLimit(failKey, ADMIN_MAX_FAILS);
   return errorResponse(isApi, 401, "unauthorized", "Authentication required", {
     "WWW-Authenticate": 'Basic realm="SabaiSafe admin"',
+    "X-Robots-Tag": "noindex, nofollow",
   });
 }
 
 export default function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const isApi = pathname.startsWith("/api/");
+  const path = decodePath(req.nextUrl.pathname);
+  if (path === null) return new NextResponse("Bad request", { status: 400 });
+  const isApi = /^\/api(\/|$)/i.test(path);
 
-  if (isAdminPath(pathname)) {
+  if (isAdminPath(path)) {
     const denied = checkAdmin(req, isApi);
     if (denied) return denied;
   }
 
   if (isApi) {
-    const ai = isAiRoute(pathname);
+    const ai = isAiRoute(path);
     const limit = ai
       ? envLimit(process.env.RATE_LIMIT_AI_PER_MIN, 15)
       : envLimit(process.env.RATE_LIMIT_DATA_PER_MIN, 60);

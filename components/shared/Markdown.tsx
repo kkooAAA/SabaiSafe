@@ -15,7 +15,7 @@ export function Markdown({ children }: { children: string }) {
               return (
                 <a
                   href={href}
-                  className="mx-0.5 inline-flex min-w-5 items-center justify-center rounded bg-accent px-1 align-baseline text-xs font-semibold text-primary no-underline"
+                  className="relative mx-0.5 inline-flex min-w-5 items-center justify-center rounded bg-accent px-1 align-baseline text-xs font-semibold text-primary no-underline after:absolute after:-inset-x-2 after:-inset-y-3.5 after:content-['']"
                 >
                   [{c}]
                 </a>

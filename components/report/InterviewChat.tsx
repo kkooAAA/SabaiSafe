@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { FileText, Send, Square } from "lucide-react";
 import { MAX_MESSAGE_CHARS } from "@/types/protocol";
 import { cn } from "@/lib/utils";
-import { ConfirmButton } from "./ConfirmButton";
+import { ConfirmButton } from "@/components/shared/ConfirmButton";
 import { checkNextMessage, isAtLimit, type LimitProblem, type Msg } from "./report-state";
 
 export type ChatStatus = "idle" | "loading" | "error" | "stopped";
@@ -107,7 +107,7 @@ export function InterviewChat(p: Props) {
         <button
           type="button"
           onClick={p.onRetry}
-          className="h-10 rounded-md border bg-background px-4 text-sm font-medium"
+          className="h-11 rounded-md border bg-background px-4 text-sm font-medium"
           data-testid="report-retry"
         >
           {t("retry")}
@@ -191,9 +191,20 @@ export function InterviewChat(p: Props) {
           {p.generating ? t("creating") : t("createSummary")}
         </button>
         {p.generateError && (
-          <p role="alert" className="text-sm text-destructive" data-testid="report-generate-error">
-            {te(p.generateError)}
-          </p>
+          <div role="alert" className="space-y-2" data-testid="report-generate-error">
+            <p className="text-sm text-destructive">{te(p.generateError)}</p>
+            {p.generateError !== "too_long_or_invalid" && (
+              <button
+                type="button"
+                onClick={p.onGenerate}
+                disabled={loading || p.generating}
+                className="h-11 rounded-md border bg-background px-4 text-sm font-medium disabled:opacity-50"
+                data-testid="report-generate-retry"
+              >
+                {t("retry")}
+              </button>
+            )}
+          </div>
         )}
         {(p.messages.length > 0 || p.status !== "idle") && (
           <ConfirmButton

@@ -377,3 +377,31 @@ describe("saveReplacing", () => {
     }
   });
 });
+
+// ------------------------------------------------------------------ AI busy (UPSTREAMBUSY / 503) handling
+describe("AI busy mapping", () => {
+  it("errorKeyFor: 503 on chat/generate ⇒ busy; save keeps save_unavailable; open/delete keep unavailable", () => {
+    expect(errorKeyFor("chat", 503, "unavailable")).toBe("busy");
+    expect(errorKeyFor("generate", 503, "unavailable")).toBe("busy");
+    expect(errorKeyFor("save", 503, "unavailable")).toBe("save_unavailable");
+    expect(errorKeyFor("open", 503, "unavailable")).toBe("unavailable");
+    expect(errorKeyFor("delete", 503, "unavailable")).toBe("unavailable");
+    expect(errorKeyFor("chat", 429, "rate_limited")).toBe("rate_limited");
+  });
+
+  it("a 503 JSON from /api/report/chat shows the busy message and Retry resends the same conversation", async () => {
+    let n = 0;
+    const calls = setup("en", {
+      "/api/report/chat": () =>
+        ++n === 1
+          ? Response.json({ error: { code: "unavailable", message: "busy" } }, { status: 503 })
+          : textStream(["Mock question 1?"]),
+    });
+    fireEvent.click(screen.getByRole("button", { name: en.report.notice.start }));
+    await send("bag stolen");
+    expect(await screen.findByTestId("report-chat-error")).toHaveTextContent(en.report.errors.busy);
+    fireEvent.click(screen.getByTestId("report-retry"));
+    await screen.findByText("Mock question 1?");
+    expect((calls[1]!.body as { messages: Msg[] }).messages).toEqual([u("bag stolen")]);
+  });
+});

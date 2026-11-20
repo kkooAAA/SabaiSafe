@@ -1,20 +1,18 @@
 import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { BUSINESS_CRITERIA } from "@/types/protocol";
 import type { Business } from "@/types/api";
 import { pickLang } from "@/components/shared/format";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ExternalLinks } from "@/components/shared/ExternalLinks";
-
-const KNOWN = new Set<string>(BUSINESS_CRITERIA);
+import { metCriteria } from "./trusted";
 
 export function BusinessCard({ business: b }: { business: Business }) {
   const locale = useLocale();
   const t = useTranslations("help");
-  const criteria = b.criteria_met.filter((k) => KNOWN.has(k));
+  const criteria = metCriteria(b.criteria_met);
   const desc = pickLang(locale, b.description_en, b.description_zh);
   return (
-    <article className="space-y-2 rounded-xl border bg-card p-4 shadow-xs" data-sponsored={b.is_sponsored || undefined}>
+    <article className="space-y-2 rounded-xl border bg-card p-4 shadow-xs" data-sponsored={b.is_sponsored || undefined} data-testid="business-card">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="font-semibold leading-snug">{pickLang(locale, b.name, b.name_zh)}</h3>

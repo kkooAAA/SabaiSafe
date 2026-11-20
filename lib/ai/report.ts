@@ -10,9 +10,9 @@ import { READY_TOKEN, ReportFacts, type ChatMessage, type ReportGenerateResponse
 import { guardAnswer } from "./answer-guard";
 import { EXTRACT_RETRY_MESSAGE } from "./constants";
 import { REPORT_EXTRACT_SYSTEM, REPORT_THAI_SYSTEM, reportInterviewSystem } from "./prompts";
-import { chatModel, fastModel } from "./provider";
+import { chatModel, fastModel, modelCallOptions } from "./provider";
 import { scrubDeep, scrubPII } from "./scrub";
-import { textDeltas, textStreamResponse } from "./stream";
+import { textDeltas, textStreamResponse, primeDeltas } from "./stream";
 
 export const REPORT_HEADING_TH = "## ฉบับภาษาไทย (สำหรับเจ้าหน้าที่)";
 export const REPORT_HEADING_EN = "## English translation (for you to check)";
@@ -45,12 +45,13 @@ export function startsAndEndsWithUser(messages: ChatMessage[]): boolean {
 // ------------------------------------------------------------------ interview
 
 /** Streams the next interview message. Model setup errors (missing key) throw before streaming starts. */
-export function interviewResponse(messages: ChatMessage[], lang: UiLang, signal?: AbortSignal): Response {
+export async function interviewResponse(messages: ChatMessage[], lang: UiLang, signal?: AbortSignal): Promise<Response> {
   const model = chatModel();
   const history: ModelMessage[] = scrubConversation(messages)
     .filter((m) => m.content.trim() !== "")
     .map((m) => ({ role: m.role, content: m.content }));
   const result = streamText({
+    ...modelCallOptions(),
     model,
     system: reportInterviewSystem(lang),
     messages: history,
@@ -58,7 +59,7 @@ export function interviewResponse(messages: ChatMessage[], lang: UiLang, signal?
     maxOutputTokens: 400,
     abortSignal: signal,
   });
-  return textStreamResponse(guardAnswer(textDeltas(result.stream)), {
+  return textStreamResponse(guardAnswer(await primeDeltas(textDeltas(result.stream))), {
     ready: true,
     onError: (err) => console.error("[/api/report/chat] stream failed", err),
   });
@@ -101,6 +102,7 @@ export async function extractFacts(messages: ChatMessage[], signal?: AbortSignal
   const history: ModelMessage[] = [{ role: "user", content: transcript(scrubConversation(messages)) }];
   for (let attempt = 0; attempt < 2; attempt++) {
     const { text } = await generateText({
+      ...modelCallOptions(),
       model,
       system: REPORT_EXTRACT_SYSTEM,
       messages: history,
@@ -162,6 +164,7 @@ export async function writeThaiSummary(facts: ReportFacts, signal?: AbortSignal)
   const model = chatModel();
   for (let attempt = 0; attempt < 2; attempt++) {
     const { text } = await generateText({
+      ...modelCallOptions(),
       model,
       system: REPORT_THAI_SYSTEM,
       prompt: `FACTS (JSON):\n${JSON.stringify(facts, null, 2)}`,

@@ -46,8 +46,8 @@ Status: `todo` · `doing` · `review` (qa reviewing) · `done` · `blocked`. Upd
 ## Phase 4 — Trusted Services, admin, polish, eval
 | ID | Task | Owner | Deps | Status |
 |---|---|---|---|---|
-| P4-1 | Trusted Services list (criteria chips, Sponsored label) | frontend | P1-6 | todo |
-| P4-2 | `/api/admin/*` CRUD for prices and businesses | backend | P1-3 | todo |
-| P4-3 | Admin page | frontend | P4-2 | todo |
-| P4-4 | Polish, a11y, 375px pass in en/zh | frontend | all | todo |
-| P4-5 | Full eval run + final qa report | qa | all | todo |
+| P4-1 | Trusted Services list (criteria chips, Sponsored label) | frontend | P1-6 | review |
+| P4-2 | `/api/admin/*` CRUD for prices and businesses (+ fix: in-memory report store shared across route bundles) | backend | P1-3 | done |
+| P4-3 | Admin page | frontend | P4-2 | review |
+| P4-4 | Polish, a11y, 375px pass in en/zh | frontend | all | review |
+| P4-5 | Full eval run + final qa report | qa | all | doing |

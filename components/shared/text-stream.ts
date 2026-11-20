@@ -64,3 +64,13 @@ export async function postTextStream(
   onText(final.text);
   return { ok: true, text: final.text, error: final.error };
 }
+
+/**
+ * Message key (under `errors` / `report.errors`) for a failed AI request, or null for "not an AI-capacity error".
+ * 503 `unavailable` from the AI routes means the provider is busy or out of quota: "busy, try again in a minute".
+ */
+export function aiErrorKey(status: number, code: string | null | undefined): "busy" | "rate_limited" | null {
+  if (status === 429 || code === "rate_limited") return "rate_limited";
+  if (status === 503 || code === "unavailable") return "busy";
+  return null;
+}
