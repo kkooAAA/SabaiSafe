@@ -1,0 +1,321 @@
+{
+  "app": {
+    "name": "SabaiSafe",
+    "tagline": "Safety and legal information for tourists in Phuket"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "legal": "Legal",
+    "report": "Report",
+    "price": "Prices",
+    "help": "Help"
+  },
+  "locale": {
+    "switchTo": "Switch language",
+    "name": {
+      "en": "English",
+      "zh": "中文"
+    }
+  },
+  "emergency": {
+    "label": "Emergency hotlines",
+    "title": "SOS",
+    "short": {
+      "tourist_police": "Tourist Police",
+      "police": "Police",
+      "ambulance": "Ambulance",
+      "consumer": "Consumer"
+    }
+  },
+  "home": {
+    "title": "Stay safe in Phuket",
+    "intro": "Know the local rules, check fair prices, and get help fast.",
+    "disclaimer": "SabaiSafe gives general information, not legal advice. In an emergency, call the numbers above.",
+    "tiles": {
+      "legal": {
+        "title": "Legal Guide",
+        "desc": "Thai laws and local rules, with sources"
+      },
+      "report": {
+        "title": "Report Assistant",
+        "desc": "Prepare a Thai summary to bring to the police"
+      },
+      "price": {
+        "title": "Fair Price",
+        "desc": "Reference prices for taxis, rentals and more"
+      },
+      "help": {
+        "title": "Help & Trusted Services",
+        "desc": "Hotlines, police, hospitals and embassies"
+      }
+    }
+  },
+  "help": {
+    "title": "Help & Trusted Services",
+    "intro": "Emergency hotlines, police stations, hospitals and embassies in Phuket.",
+    "hotlinesTitle": "Emergency hotlines",
+    "hotlinesNote": "Tap a number to call. Tourist Police: English-speaking officers available.",
+    "contactsTitle": "Police, hospitals and offices",
+    "filterLabel": "Filter by type",
+    "noContacts": "No contacts in this category yet.",
+    "noPhone": "No verified phone number yet. Call 1155 if you need help.",
+    "area": "Area",
+    "address": "Address",
+    "hours": "Hours",
+    "languages": "Languages",
+    "lang": {
+      "th": "Thai",
+      "en": "English",
+      "zh": "Chinese",
+      "ru": "Russian"
+    },
+    "category": {
+      "emergency": "Emergency",
+      "police": "Police",
+      "hospital": "Hospitals",
+      "embassy": "Embassies",
+      "consumer": "Consumer",
+      "immigration": "Immigration",
+      "other": "Other"
+    },
+    "businessesTitle": "Trusted services",
+    "businessesNote": "Businesses that meet our basic criteria. Sponsored listings are labelled and never change the order.",
+    "noBusinesses": "No listed businesses yet.",
+    "businessCategory": {
+      "rental": "Rental",
+      "transport": "Transport",
+      "tour": "Tour",
+      "hotel": "Hotel",
+      "restaurant": "Restaurant",
+      "shop": "Shop",
+      "other": "Other"
+    },
+    "criteriaLabel": "Criteria met",
+    "criteria": {
+      "registered_business": "Registered business",
+      "displays_prices": "Shows prices upfront",
+      "written_contract": "Written contract",
+      "no_passport_deposit": "No passport deposit",
+      "insurance": "Insurance",
+      "receipts": "Gives receipts"
+    },
+    "checkedOn": "Checked on {date}",
+    "sampleNotice": "Demo listings marked “Sample data” are fictional."
+  },
+  "price": {
+    "title": "Fair Price",
+    "intro": "Reference prices to compare before you pay. Each price shows its source and date.",
+    "itemLabel": "What are you paying for?",
+    "areaLabel": "Where?",
+    "allItems": "All items",
+    "allAreas": "All areas",
+    "resultCount": "{count, plural, =0 {No prices} one {# price} other {# prices}}",
+    "noResults": "No reference price for this choice yet. Ask for the price before you agree.",
+    "fixedByLaw": "Set by law",
+    "sourceLine": "Collected {date} · Source:",
+    "sampleNotice": "Prices marked “Sample data” are demo figures, not official prices.",
+    "disclaimer": "Reference prices are a guide only. Real prices can vary by season, time and vehicle.",
+    "category": {
+      "transport": "Transport",
+      "rental": "Rentals",
+      "activity": "Activities",
+      "food": "Food & drink",
+      "accommodation": "Accommodation",
+      "other": "Other"
+    },
+    "unit": {
+      "per_trip": "per trip",
+      "per_km": "per km",
+      "per_person": "per person",
+      "per_30min": "per 30 min",
+      "per_hour": "per hour",
+      "per_day": "per day",
+      "per_week": "per week",
+      "per_night": "per night",
+      "per_item": "per item",
+      "per_kg": "per kg"
+    },
+    "check": {
+      "title": "Were you quoted a price?",
+      "quotedLabel": "Price you were quoted (THB)",
+      "quotedPlaceholder": "e.g. 1200",
+      "submit": "Check",
+      "checking": "Checking…",
+      "note": "AI explanation based only on the reference prices shown. It is not legal advice.",
+      "unitLabel": "Unit",
+      "invalidQuoted": "Enter a price in baht, e.g. 1200 (leave empty to see the typical range).",
+      "comparedWith": "Compared with:",
+      "noDataHint": "We have no reference price for this yet. If you feel pressured or cheated, you can call:",
+      "otherCurrency": "Please enter the price in Thai baht (THB), not another currency."
+    },
+    "verdict": {
+      "within": "Within normal range",
+      "above": "Above typical range",
+      "far_above": "Far above typical range",
+      "no_quote": "No price quoted",
+      "no_data": "Not enough data"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "incomplete": "The answer was cut off. Please try again.",
+    "network": "Connection problem. Check your internet and try again.",
+    "rate_limited": "Too many requests. Please wait a minute and try again.",
+    "unavailable": "This feature is not available right now.",
+    "invalid": "Please check your question and try again."
+  },
+  "common": {
+    "comingSoon": "This feature is coming soon.",
+    "sample": "Sample data",
+    "verified": "Verified",
+    "unverified": "Not yet verified",
+    "sponsored": "Sponsored",
+    "source": "Source",
+    "map": "Map",
+    "website": "Website",
+    "call": "Call",
+    "all": "All",
+    "unavailable": "This information is temporarily unavailable. Please try again later.",
+    "draft": "Draft — not yet verified"
+  },
+  "legal": {
+    "title": "Legal Guide",
+    "intro": "Ask about Thai laws and local rules in Phuket. Answers come only from our sources, with citations.",
+    "askLabel": "Your question",
+    "placeholder": "e.g. Can a jet ski shop keep my passport?",
+    "submit": "Ask",
+    "asking": "Searching…",
+    "stop": "Stop",
+    "newQuestion": "Ask another question",
+    "tooLong": "Please keep your question under {max} characters.",
+    "empty": "Please type a question.",
+    "examplesTitle": "Example questions",
+    "examples": {
+      "scam": {
+        "label": "Scams",
+        "q": "A jet ski shop says I damaged the jet ski and wants 30,000 baht. What can I do?"
+      },
+      "transport": {
+        "label": "Taxis",
+        "q": "The taxi driver will not use the meter. Is that allowed?"
+      },
+      "rental": {
+        "label": "Rentals",
+        "q": "Can a scooter rental shop keep my passport as a deposit?"
+      },
+      "alcohol_drugs": {
+        "label": "Alcohol & drugs",
+        "q": "Is cannabis legal for tourists in Phuket?"
+      },
+      "beach_rules": {
+        "label": "Beaches",
+        "q": "Can I smoke or drink alcohol on Patong Beach?"
+      }
+    },
+    "loading": "Finding sources and writing an answer…",
+    "yourQuestion": "Your question",
+    "answerTitle": "Answer",
+    "sourcesTitle": "Sources",
+    "noSources": "Sources could not be loaded for this answer. Treat it with care and check with the Tourist Police.",
+    "section": "Section",
+    "location": "Area",
+    "openSource": "Open source",
+    "noLink": "No online source link yet",
+    "excerpt": "Excerpt",
+    "draftNote": "Some sources are drafts that a legal reviewer has not checked yet.",
+    "disclaimerTitle": "Important",
+    "disclaimer": "This is general information, not legal advice. For help, call Tourist Police 1155.",
+    "noAnswerTitle": "No verified information yet",
+    "noAnswerHint": "We could not find a source for this question. These official hotlines can help:",
+    "emergencyTitle": "Is this an emergency?",
+    "emergencyText": "If you are in danger or someone is hurt, call now:",
+    "stopped": "Stopped. The answer above is incomplete.",
+    "incomplete": "The answer may be cut off. Please try again.",
+    "retry": "Try again"
+  },
+  "report": {
+    "title": "Report Assistant",
+    "intro": "Tell us what happened. We help you write a short summary in Thai (with an English copy) to show the police.",
+    "notice": {
+      "title": "Before you start",
+      "aiProvider": "What you type is sent to an AI service to write the summary.",
+      "notStored": "Nothing is stored unless you choose to save it at the end.",
+      "noPassport": "Do not type your passport number, phone number or other ID numbers.",
+      "notFiling": "This tool does not file a police report. You bring the summary to the police yourself.",
+      "start": "Start"
+    },
+    "chat": {
+      "title": "Interview",
+      "greeting": "Hello. I will ask you a few questions about what happened, then write a summary for the police. In your own words, what happened?",
+      "you": "You",
+      "assistant": "Assistant",
+      "label": "Your message",
+      "placeholder": "Type your answer…",
+      "send": "Send",
+      "sending": "Writing…",
+      "stop": "Stop",
+      "stopped": "Stopped. Send a message or try again.",
+      "retry": "Try again",
+      "thinking": "The assistant is writing…",
+      "readyHint": "All set. You can now create the summary.",
+      "notReadyHint": "Answer the questions. When the assistant has read back your facts and you confirm, you can create the summary.",
+      "createSummary": "Create summary",
+      "creating": "Creating summary…",
+      "startOver": "Start over",
+      "confirmStartOver": "Start over? This conversation will be cleared."
+    },
+    "limits": {
+      "empty": "Please type a message.",
+      "message_too_long": "Please keep each message under {max} characters.",
+      "too_many": "This conversation has reached its length limit. Please start over and keep answers short.",
+      "too_long": "This conversation has reached its length limit. Please start over and keep answers short."
+    },
+    "summary": {
+      "title": "Your summary",
+      "notPolice": "This is NOT a police report.",
+      "notPoliceText": "Nothing has been sent to the police. Bring this summary (printed or on your phone) to the Tourist Police or a police station. Help:",
+      "thai": "Thai (for the officer)",
+      "english": "English (for you to check)",
+      "checkHint": "Check the English copy. If something is wrong, go back to the chat and correct it.",
+      "downloadPdf": "Download PDF",
+      "downloading": "Preparing PDF…",
+      "downloaded": "PDF downloaded.",
+      "backToChat": "Back to chat",
+      "newReport": "Start a new summary",
+      "savedCopy": "Saved summary (available until {date})"
+    },
+    "save": {
+      "title": "Save for 30 days (optional)",
+      "text": "Save this summary so you can open it again on this device. It is deleted automatically after 30 days, or earlier if you delete it.",
+      "consent": "I agree that SabaiSafe stores this summary for up to 30 days so I can open it again. I can delete it at any time.",
+      "button": "Save for 30 days",
+      "saving": "Saving…",
+      "saved": "Saved. Available on this device until {date}.",
+      "noStorage": "Saved, but this browser cannot remember it. Keep the PDF instead.",
+      "open": "Open saved summary",
+      "opening": "Opening…",
+      "delete": "Delete now",
+      "deleting": "Deleting…",
+      "deleted": "The saved summary was deleted.",
+      "confirmDelete": "Delete the saved summary now? This cannot be undone.",
+      "existing": "You have a saved summary on this device (until {date}).",
+      "replaces": "You already have a saved summary on this device. Saving this one deletes the earlier one first, because only one can be kept."
+    },
+    "errors": {
+      "network": "Connection problem. Check your internet and try again.",
+      "rate_limited": "Too many requests. Please wait a minute and try again.",
+      "unavailable": "The Report Assistant is not available right now. Please try again later.",
+      "save_unavailable": "Saving is not available right now. Download the PDF instead.",
+      "consent_required": "Please tick the consent box to save.",
+      "consent_outdated": "The consent text has changed. Please reload the page and try again.",
+      "not_found": "The saved summary was not found. It may have expired or been deleted.",
+      "too_long_or_invalid": "The conversation could not be processed. It may be too long. Please start over.",
+      "invalid": "The request was not accepted. Please try again.",
+      "incomplete": "The reply was cut off. Please try again.",
+      "generic": "Something went wrong. Please try again.",
+      "replace_failed": "Your earlier saved summary could not be deleted, so this one was not saved. Please try again."
+    },
+    "cancel": "Cancel"
+  }
+}

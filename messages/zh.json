@@ -1,0 +1,321 @@
+{
+  "app": {
+    "name": "SabaiSafe",
+    "tagline": "普吉岛游客安全与法律信息"
+  },
+  "nav": {
+    "label": "主导航",
+    "home": "首页",
+    "legal": "法律",
+    "report": "报案",
+    "price": "价格",
+    "help": "求助"
+  },
+  "locale": {
+    "switchTo": "切换语言",
+    "name": {
+      "en": "English",
+      "zh": "中文"
+    }
+  },
+  "emergency": {
+    "label": "紧急电话",
+    "title": "SOS",
+    "short": {
+      "tourist_police": "旅游警察",
+      "police": "报警",
+      "ambulance": "急救",
+      "consumer": "消费者保护"
+    }
+  },
+  "home": {
+    "title": "普吉岛安心游",
+    "intro": "了解当地规定，查询合理价格，快速获得帮助。",
+    "disclaimer": "SabaiSafe 仅提供一般信息，不构成法律意见。紧急情况请拨打上方电话。",
+    "tiles": {
+      "legal": {
+        "title": "法律指南",
+        "desc": "泰国法律与当地规定，附出处"
+      },
+      "report": {
+        "title": "报案助手",
+        "desc": "生成泰文事件摘要，带去警局"
+      },
+      "price": {
+        "title": "合理价格",
+        "desc": "出租车、租车等参考价格"
+      },
+      "help": {
+        "title": "求助与可信服务",
+        "desc": "热线、警局、医院和使领馆"
+      }
+    }
+  },
+  "help": {
+    "title": "求助与可信服务",
+    "intro": "普吉岛的紧急热线、警察局、医院和使领馆。",
+    "hotlinesTitle": "紧急热线",
+    "hotlinesNote": "点击号码即可拨打。旅游警察：有会说英语的警员。",
+    "contactsTitle": "警察局、医院和机构",
+    "filterLabel": "按类型筛选",
+    "noContacts": "此类别暂无联系方式。",
+    "noPhone": "暂无已核实的电话。如需帮助请拨打 1155。",
+    "area": "区域",
+    "address": "地址",
+    "hours": "时间",
+    "languages": "语言",
+    "lang": {
+      "th": "泰语",
+      "en": "英语",
+      "zh": "中文",
+      "ru": "俄语"
+    },
+    "category": {
+      "emergency": "紧急",
+      "police": "警察",
+      "hospital": "医院",
+      "embassy": "使领馆",
+      "consumer": "消费者",
+      "immigration": "移民局",
+      "other": "其他"
+    },
+    "businessesTitle": "可信服务",
+    "businessesNote": "符合我们基本标准的商家。赞助商家均有标注，且不影响排序。",
+    "noBusinesses": "暂无收录商家。",
+    "businessCategory": {
+      "rental": "租赁",
+      "transport": "交通",
+      "tour": "旅游团",
+      "hotel": "酒店",
+      "restaurant": "餐厅",
+      "shop": "商店",
+      "other": "其他"
+    },
+    "criteriaLabel": "符合的标准",
+    "criteria": {
+      "registered_business": "正规注册",
+      "displays_prices": "明码标价",
+      "written_contract": "书面合同",
+      "no_passport_deposit": "不扣押护照",
+      "insurance": "含保险",
+      "receipts": "提供收据"
+    },
+    "checkedOn": "核实日期：{date}",
+    "sampleNotice": "标有“示例数据”的商家为虚构的演示数据。"
+  },
+  "price": {
+    "title": "合理价格",
+    "intro": "付款前可对比的参考价格，每条均注明来源和日期。",
+    "itemLabel": "您要付费的项目？",
+    "areaLabel": "在哪里？",
+    "allItems": "全部项目",
+    "allAreas": "全部区域",
+    "resultCount": "{count, plural, =0 {暂无价格} other {共 # 条价格}}",
+    "noResults": "暂无此项的参考价格。请在同意前先问清价格。",
+    "fixedByLaw": "法定价格",
+    "sourceLine": "采集日期 {date} · 来源：",
+    "sampleNotice": "标有“示例数据”的价格为演示数字，并非官方价格。",
+    "disclaimer": "参考价格仅供参考，实际价格可能因季节、时间和车型而异。",
+    "category": {
+      "transport": "交通",
+      "rental": "租赁",
+      "activity": "活动",
+      "food": "餐饮",
+      "accommodation": "住宿",
+      "other": "其他"
+    },
+    "unit": {
+      "per_trip": "每趟",
+      "per_km": "每公里",
+      "per_person": "每人",
+      "per_30min": "每30分钟",
+      "per_hour": "每小时",
+      "per_day": "每天",
+      "per_week": "每周",
+      "per_night": "每晚",
+      "per_item": "每件",
+      "per_kg": "每公斤"
+    },
+    "check": {
+      "title": "有人给您报价了吗？",
+      "quotedLabel": "对方报价（泰铢）",
+      "quotedPlaceholder": "例如 1200",
+      "submit": "核对",
+      "checking": "核对中…",
+      "note": "AI 说明仅基于上方显示的参考价格，不构成法律意见。",
+      "unitLabel": "单位",
+      "invalidQuoted": "请输入泰铢金额，例如 1200（留空可查看常见价格范围）。",
+      "comparedWith": "对比参考价：",
+      "noDataHint": "我们暂无此项的参考价格。如感到被强迫或受骗，可拨打：",
+      "otherCurrency": "请输入泰铢（THB）金额，不要使用人民币或其他货币。"
+    },
+    "verdict": {
+      "within": "在正常范围内",
+      "above": "高于常见范围",
+      "far_above": "远高于常见范围",
+      "no_quote": "未提供报价",
+      "no_data": "数据不足"
+    }
+  },
+  "errors": {
+    "generic": "出错了，请重试。",
+    "incomplete": "回答中断了，请重试。",
+    "network": "网络连接有问题，请检查网络后重试。",
+    "rate_limited": "请求过多，请稍等一分钟后再试。",
+    "unavailable": "此功能暂时无法使用。",
+    "invalid": "请检查您的问题后重试。"
+  },
+  "common": {
+    "comingSoon": "此功能即将推出。",
+    "sample": "示例数据",
+    "verified": "已核实",
+    "unverified": "尚未核实",
+    "sponsored": "赞助",
+    "source": "来源",
+    "map": "地图",
+    "website": "网站",
+    "call": "拨打",
+    "all": "全部",
+    "unavailable": "此信息暂时无法获取，请稍后再试。",
+    "draft": "草稿 — 尚未核实"
+  },
+  "legal": {
+    "title": "法律指南",
+    "intro": "查询普吉岛的泰国法律和当地规定。答案仅来自我们的资料来源，并附有引用。",
+    "askLabel": "您的问题",
+    "placeholder": "例如：摩托艇店可以扣留我的护照吗？",
+    "submit": "提问",
+    "asking": "正在查找…",
+    "stop": "停止",
+    "newQuestion": "再问一个问题",
+    "tooLong": "问题请不要超过 {max} 个字符。",
+    "empty": "请输入您的问题。",
+    "examplesTitle": "示例问题",
+    "examples": {
+      "scam": {
+        "label": "诈骗",
+        "q": "摩托艇店说我损坏了摩托艇，要我赔 30,000 泰铢，我该怎么办？"
+      },
+      "transport": {
+        "label": "出租车",
+        "q": "出租车司机不肯打表，这样合法吗？"
+      },
+      "rental": {
+        "label": "租赁",
+        "q": "摩托车租赁店可以扣留我的护照作为押金吗？"
+      },
+      "alcohol_drugs": {
+        "label": "酒类与毒品",
+        "q": "游客在普吉岛使用大麻合法吗？"
+      },
+      "beach_rules": {
+        "label": "海滩",
+        "q": "在芭东海滩可以吸烟或喝酒吗？"
+      }
+    },
+    "loading": "正在查找资料并生成回答…",
+    "yourQuestion": "您的问题",
+    "answerTitle": "回答",
+    "sourcesTitle": "资料来源",
+    "noSources": "未能加载此回答的资料来源。请谨慎参考，并向旅游警察核实。",
+    "section": "条款",
+    "location": "地区",
+    "openSource": "查看来源",
+    "noLink": "暂无在线来源链接",
+    "excerpt": "摘录",
+    "draftNote": "部分资料为草稿，尚未经法律审核人员核实。",
+    "disclaimerTitle": "重要提示",
+    "disclaimer": "以上为一般信息，并非法律意见。如需帮助，请拨打旅游警察电话 1155。",
+    "noAnswerTitle": "暂无核实信息",
+    "noAnswerHint": "我们没有找到与此问题相关的资料。以下官方热线可以提供帮助：",
+    "emergencyTitle": "这是紧急情况吗？",
+    "emergencyText": "如果您身处危险或有人受伤，请立即拨打：",
+    "stopped": "已停止。上面的回答不完整。",
+    "incomplete": "回答可能不完整，请重试。",
+    "retry": "重试"
+  },
+  "report": {
+    "title": "报案助手",
+    "intro": "告诉我们发生了什么。我们帮您写一份泰文简要说明（附英文副本），供您出示给警方。",
+    "notice": {
+      "title": "开始之前",
+      "aiProvider": "您输入的内容会发送给人工智能服务，用于撰写说明。",
+      "notStored": "除非您在最后选择保存，否则不会存储任何内容。",
+      "noPassport": "请勿输入护照号码、电话号码或其他证件号码。",
+      "notFiling": "本工具不会替您报案。请您自行携带说明前往警方。",
+      "start": "开始"
+    },
+    "chat": {
+      "title": "问答",
+      "greeting": "您好。我会问您几个关于事件经过的问题，然后为警方写一份说明。请用您自己的话说说发生了什么？",
+      "you": "您",
+      "assistant": "助手",
+      "label": "您的消息",
+      "placeholder": "请输入您的回答…",
+      "send": "发送",
+      "sending": "正在回复…",
+      "stop": "停止",
+      "stopped": "已停止。请发送消息或重试。",
+      "retry": "重试",
+      "thinking": "助手正在回复…",
+      "readyHint": "已完成。您现在可以创建说明。",
+      "notReadyHint": "请回答问题。助手复述事实并经您确认后，即可创建说明。",
+      "createSummary": "创建说明",
+      "creating": "正在创建说明…",
+      "startOver": "重新开始",
+      "confirmStartOver": "要重新开始吗？此对话将被清除。"
+    },
+    "limits": {
+      "empty": "请输入消息。",
+      "message_too_long": "每条消息请不要超过 {max} 个字符。",
+      "too_many": "此对话已达到长度上限。请重新开始，并尽量简短回答。",
+      "too_long": "此对话已达到长度上限。请重新开始，并尽量简短回答。"
+    },
+    "summary": {
+      "title": "您的说明",
+      "notPolice": "这不是警方报案记录。",
+      "notPoliceText": "尚未向警方发送任何内容。请携带此说明（打印或手机上）前往旅游警察或警察局。求助：",
+      "thai": "泰文（给警官）",
+      "english": "英文（供您核对）",
+      "checkHint": "请核对英文副本。如有错误，请返回对话进行更正。",
+      "downloadPdf": "下载 PDF",
+      "downloading": "正在生成 PDF…",
+      "downloaded": "PDF 已下载。",
+      "backToChat": "返回对话",
+      "newReport": "新建说明",
+      "savedCopy": "已保存的说明（保留至 {date}）"
+    },
+    "save": {
+      "title": "保存 30 天（可选）",
+      "text": "保存此说明，以便在本设备上再次打开。30 天后自动删除，您也可以提前删除。",
+      "consent": "我同意 SabaiSafe 将此说明保存最多 30 天，以便我再次打开。我可以随时删除。",
+      "button": "保存 30 天",
+      "saving": "正在保存…",
+      "saved": "已保存。在本设备上可打开至 {date}。",
+      "noStorage": "已保存，但此浏览器无法记住它。请改为保留 PDF。",
+      "open": "打开已保存的说明",
+      "opening": "正在打开…",
+      "delete": "立即删除",
+      "deleting": "正在删除…",
+      "deleted": "已删除保存的说明。",
+      "confirmDelete": "现在删除已保存的说明吗？此操作无法撤销。",
+      "existing": "本设备上有一份已保存的说明（保留至 {date}）。",
+      "replaces": "本设备上已有一份已保存的说明。保存这一份会先删除之前那份，因为只能保留一份。"
+    },
+    "errors": {
+      "network": "网络连接有问题。请检查网络后重试。",
+      "rate_limited": "请求过多。请等一分钟后再试。",
+      "unavailable": "报案助手暂时不可用。请稍后再试。",
+      "save_unavailable": "暂时无法保存。请改为下载 PDF。",
+      "consent_required": "请勾选同意框后再保存。",
+      "consent_outdated": "同意条款已更新。请刷新页面后重试。",
+      "not_found": "找不到已保存的说明。它可能已过期或已被删除。",
+      "too_long_or_invalid": "无法处理此对话，可能内容过长。请重新开始。",
+      "invalid": "请求未被接受。请重试。",
+      "incomplete": "回复被中断。请重试。",
+      "generic": "出现问题。请重试。",
+      "replace_failed": "无法删除您之前保存的说明，因此这一份未保存。请重试。"
+    },
+    "cancel": "取消"
+  }
+}

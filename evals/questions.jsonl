@@ -1,0 +1,40 @@
+{"id":"en-01","lang":"en","question":"The hotel says I broke a lamp and wants to keep my whole deposit. Can they do that?","expected_slugs":["accommodation-deposits"]}
+{"id":"en-02","lang":"en","question":"What time can shops sell beer in Phuket? I tried to buy some at 3pm and they refused.","expected_slugs":["alcohol-sale-hours"]}
+{"id":"en-03","lang":"en","question":"If the police arrest me, do I have the right to a lawyer and an interpreter?","expected_slugs":["arrest-rights-police-reports"]}
+{"id":"en-04","lang":"en","question":"What does a red flag on Patong beach mean? Can I still swim?","expected_slugs":["beach-safety-flags-sunbeds"]}
+{"id":"en-05","lang":"en","question":"Is it legal to smoke a cigarette on the beach in Phuket?","expected_slugs":["beach-smoking-littering"]}
+{"id":"en-06","lang":"en","question":"Do I have to carry my passport with me all the time? A policeman asked to see my ID.","expected_slugs":["carrying-id-police-checks"]}
+{"id":"en-07","lang":"en","question":"A shop sold me a broken phone charger and won't give a refund. Where can I complain?","expected_slugs":["consumer-complaints"]}
+{"id":"en-08","lang":"en","question":"Can I fly my drone over Kata beach to film the sunset?","expected_slugs":["drones"]}
+{"id":"en-09","lang":"en","question":"Is weed legal in Thailand now? Can I smoke a joint outside my hotel?","expected_slugs":["drugs-and-cannabis"]}
+{"id":"en-10","lang":"en","question":"Can I play poker for money with friends at our villa?","expected_slugs":["gambling"]}
+{"id":"en-11","lang":"en","question":"The jet ski operator says I scratched the jet ski and demands a lot of money. What should I do?","expected_slugs":["jet-ski-damage-claims"]}
+{"id":"en-12","lang":"en","question":"The scooter rental shop wants to keep my passport as a deposit. Is that allowed?","expected_slugs":["motorbike-rental-passport-deposit"]}
+{"id":"en-13","lang":"en","question":"A restaurant had no prices on the menu and charged me double. Is that legal?","expected_slugs":["price-display-overcharging"]}
+{"id":"en-14","lang":"en","question":"The taxi driver refuses to use the meter and asks for a fixed price. Is that allowed?","expected_slugs":["taxi-tuk-tuk-fares"]}
+{"id":"en-15","lang":"en","question":"Can I bring my e-cigarette to Thailand?","expected_slugs":["vaping-e-cigarettes"]}
+{"id":"en-16","lang":"en","question":"I overstayed my visa by two days. What will happen when I leave the country?","expected_slugs":["visa-overstay-tm30"]}
+{"id":"en-17","lang":"en","question":"I rented a motorbike and the owner says I damaged it and is holding my passport until I pay. Who can help?","expected_slugs":["motorbike-rental-passport-deposit","consumer-complaints","arrest-rights-police-reports"]}
+{"id":"en-18","lang":"en","question":"A tuk-tuk driver attacked me and I am hurt. What do I do right now?","expected_slugs":["taxi-tuk-tuk-fares","arrest-rights-police-reports"],"expect_emergency":true}
+{"id":"en-19","lang":"en","question":"What is the best Italian restaurant in Kamala?","expected_slugs":[],"expect_no_answer":true}
+{"id":"en-20","lang":"en","question":"How do I apply for a Japanese work visa from Tokyo?","expected_slugs":[],"expect_no_answer":true}
+{"id":"zh-01","lang":"zh","question":"退房时民宿说我弄坏了床单，要扣掉全部押金，这合法吗？","expected_slugs":["accommodation-deposits"]}
+{"id":"zh-02","lang":"zh","question":"普吉岛的便利店几点可以买酒？下午为什么不卖？","expected_slugs":["alcohol-sale-hours"]}
+{"id":"zh-03","lang":"zh","question":"如果被泰国警察逮捕，我有权找律师和翻译吗？","expected_slugs":["arrest-rights-police-reports"]}
+{"id":"zh-04","lang":"zh","question":"海滩上插着红旗是什么意思？还能下水游泳吗？","expected_slugs":["beach-safety-flags-sunbeds"]}
+{"id":"zh-05","lang":"zh","question":"在普吉岛海滩上抽烟会被罚款吗？","expected_slugs":["beach-smoking-littering"]}
+{"id":"zh-06","lang":"zh","question":"在泰国必须随身带护照吗？警察查证件怎么办？","expected_slugs":["carrying-id-police-checks"]}
+{"id":"zh-07","lang":"zh","question":"买到的商品有质量问题，商家拒绝退款，我可以去哪里投诉？","expected_slugs":["consumer-complaints"]}
+{"id":"zh-08","lang":"zh","question":"游客可以在普吉岛放无人机航拍吗？需要登记吗？","expected_slugs":["drones"]}
+{"id":"zh-09","lang":"zh","question":"泰国大麻现在合法吗？可以在街上吸大麻吗？","expected_slugs":["drugs-and-cannabis"]}
+{"id":"zh-10","lang":"zh","question":"在泰国和朋友打牌赌钱违法吗？","expected_slugs":["gambling"]}
+{"id":"zh-11","lang":"zh","question":"租水上摩托还车时，老板说有划痕，要我赔很多钱，怎么办？","expected_slugs":["jet-ski-damage-claims"]}
+{"id":"zh-12","lang":"zh","question":"租摩托车的店要把我的护照扣下当押金，可以吗？","expected_slugs":["motorbike-rental-passport-deposit"]}
+{"id":"zh-13","lang":"zh","question":"餐厅菜单上没有标价，结账时收费很贵，这合法吗？","expected_slugs":["price-display-overcharging"]}
+{"id":"zh-14","lang":"zh","question":"普吉岛出租车司机不打表，要求一口价，合法吗？","expected_slugs":["taxi-tuk-tuk-fares"]}
+{"id":"zh-15","lang":"zh","question":"可以带电子烟去泰国吗？被发现会怎样？","expected_slugs":["vaping-e-cigarettes"]}
+{"id":"zh-16","lang":"zh","question":"我的签证逾期了三天，出境时会被罚款吗？房东说要办TM30是什么？","expected_slugs":["visa-overstay-tm30"]}
+{"id":"zh-17","lang":"zh","question":"嘟嘟车司机到了目的地后要求加价，不给就不让下车，我该怎么办？","expected_slugs":["taxi-tuk-tuk-fares","price-display-overcharging","consumer-complaints"]}
+{"id":"zh-18","lang":"zh","question":"救命！我在芭东海滩被人打伤了，现在该怎么办？","expected_slugs":["arrest-rights-police-reports","beach-safety-flags-sunbeds"],"expect_emergency":true}
+{"id":"zh-19","lang":"zh","question":"普吉岛哪家泰式按摩店最好？","expected_slugs":[],"expect_no_answer":true}
+{"id":"zh-20","lang":"zh","question":"去日本旅游需要办什么签证？","expected_slugs":[],"expect_no_answer":true}

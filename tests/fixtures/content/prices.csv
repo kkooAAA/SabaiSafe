@@ -1,0 +1,7 @@
+item_key,item_name_en,item_name_zh,category,area,min_thb,max_thb,unit,is_fixed_by_law,source,source_url,collected_at,notes,notes_zh,is_sample
+tuktuk_short,Tuk-tuk: short ride,嘟嘟车：短途,transport,Patong,200,300,per_trip,false,SAMPLE DATA,,2026-11-01,"Agree the price first, then ride.",先谈好价格。,true
+tuktuk_short,Tuk-tuk: short ride,嘟嘟车：短途,transport,Kata,150,250,per_trip,false,SAMPLE DATA,,2026-11-01,,,true
+taxi_meter_flagfall,Metered taxi: starting fare,计价出租车：起步价,transport,Phuket,50,100,per_trip,false,SAMPLE DATA,,2026-11-01,,,true
+jetski_30min,Jet ski rental,水上摩托租赁,activity,Patong,1000,1500,per_30min,false,SAMPLE DATA,,2026-11-01,,,true
+motorbike_day,Motorbike rental,摩托车租赁,rental,Phuket Town,150,300,per_day,false,SAMPLE DATA,,2026-11-01,,,true
+water_bottle,Bottled water,瓶装水,food,Phuket,10,20,per_item,false,SAMPLE DATA,,2026-11-01,,,true

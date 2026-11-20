@@ -1,0 +1,68 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      AI_PROVIDER: mock
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+      # Secrets and server-only code must never reach the browser bundle (CLAUDE.md: no API keys in client code).
+      - name: Scan client bundle for secrets
+        run: |
+          if grep -rlE 'SUPABASE_SERVICE_ROLE_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|ADMIN_PASSWORD|sk-ant-|sk-proj-|service_role|REPORT_EXTRACT_SYSTEM|QUERY_REWRITE_SYSTEM|delete_token_hash|timingSafeEqual|PDFDocument|formal Thai incident summary' .next/static; then
+            echo "::error::secret name or server-only prompt found in .next/static"
+            exit 1
+          fi
+
+  # Separate job so the main gate stays fast. Applies the real migrations + seed to Supabase's Postgres image
+  # (pgvector + pg_cron + anon/authenticated/service_role roles) and runs tests/sql/smoke.sql.
+  db-smoke:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: supabase/postgres:15.19.0.004 # matches supabase/config.toml major_version = 15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -h localhost"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply migrations
+        run: |
+          for f in $(ls supabase/migrations/*.sql | sort); do
+            echo "::group::$f"
+            psql -v ON_ERROR_STOP=1 -q -f "$f"
+            echo "::endgroup::"
+          done
+      - name: Load seed
+        run: psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
+      - name: Seed is idempotent
+        run: psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
+      - name: Smoke test (match_legal, RLS, triggers, pg_cron, seed invariants)
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/smoke.sql
