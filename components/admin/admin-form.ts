@@ -1,6 +1,7 @@
 // Pure helpers for the admin forms (contracts §2.3, §2.4, §3.9). No React, no fetch: unit-testable by qa.
 import { BUSINESS_CRITERIA, PRICE_UNITS } from "@/types/protocol";
 import type { Business, PriceRef } from "@/types/api";
+import { AREAS, BUSINESS_CATEGORIES, PHONE_RE, PRICE_CATEGORIES } from "@/lib/db/schema";
 
 export type Entity = "prices" | "businesses";
 export type Row<E extends Entity> = E extends "prices" ? PriceRef : Business;
@@ -21,21 +22,11 @@ export type FieldSpec = {
   optionNs?: string;
 };
 
-export const PRICE_CATEGORIES = ["transport", "rental", "activity", "food", "accommodation", "other"] as const;
-export const BUSINESS_CATEGORIES = ["rental", "transport", "tour", "hotel", "restaurant", "shop", "other"] as const;
-/** Areas from contracts §5 (prices.csv). The area input suggests these but accepts others. */
-export const KNOWN_AREAS = [
-  "Phuket",
-  "Phuket Airport",
-  "Phuket Town",
-  "Patong",
-  "Kata",
-  "Karon",
-  "Kamala",
-  "Rawai",
-  "Chalong",
-  "Bang Tao",
-] as const;
+// Constants and regexes come from the server schema (pure: zod + types/api; lint exception for this one import),
+// so the client checks cannot drift from the server's. Only constants are imported, not the zod schemas.
+export { PRICE_CATEGORIES, BUSINESS_CATEGORIES };
+/** Areas from contracts §5 (prices.csv). */
+export const KNOWN_AREAS = AREAS;
 
 export const FIELDS: { [E in Entity]: readonly FieldSpec[] } = {
   prices: [
@@ -113,14 +104,21 @@ export function parseNumber(s: string): number | null {
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const isHttpUrl = (s: string) => {
-  try {
-    const u = new URL(s);
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
-  }
+/** Same as the server's isoDate: rejects impossible dates such as 2026-02-30. */
+export const isRealDate = (s: string) => {
+  if (!DATE_RE.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().startsWith(s);
 };
+/** Same regex as the server's httpUrl. */
+export const HTTP_URL_RE = /^https?:\/\/\S+$/;
+/** Same regex as the server's item_key. */
+export const ITEM_KEY_RE = /^[a-z0-9]+(_[a-z0-9]+)*$/;
+/** numeric(10,2) upper bound, as on the server. */
+export const MAX_THB = 99_999_999.99;
+const hasAtMost2Decimals = (n: number) => Math.abs(n * 100 - Math.round(n * 100)) < 1e-6;
+export const SAMPLE_SOURCE = "SAMPLE DATA";
+export const SAMPLE_NAME_PREFIX = "[SAMPLE] ";
 
 /**
  * Form → request body, with client-side checks that mirror the server's (the server is the authority and
@@ -154,12 +152,14 @@ export function fromFormValues<E extends Entity>(
     if (f.kind === "number") {
       const n = parseNumber(s);
       if (n === null || Number.isNaN(n)) errors[f.name] = "number";
+      else if (!hasAtMost2Decimals(n)) errors[f.name] = "decimals";
+      else if (n > MAX_THB) errors[f.name] = "too_large";
       else body[f.name] = n;
     } else if (f.kind === "date") {
-      if (!DATE_RE.test(s) || Number.isNaN(Date.parse(s))) errors[f.name] = "date";
+      if (!isRealDate(s)) errors[f.name] = "date";
       else body[f.name] = s;
     } else if (f.kind === "url") {
-      if (!isHttpUrl(s)) errors[f.name] = "url";
+      if (!HTTP_URL_RE.test(s)) errors[f.name] = "url";
       else body[f.name] = s;
     } else if (f.kind === "select") {
       if (f.options && !f.options.includes(s) && original?.[f.name] !== s) errors[f.name] = "option";
@@ -171,10 +171,20 @@ export function fromFormValues<E extends Entity>(
   if (entity === "prices") {
     if (!errors.min_thb && !errors.max_thb && (body.min_thb as number) > (body.max_thb as number)) errors.max_thb = "min_max";
     if (body.is_fixed_by_law === true && !body.source_url && !errors.source_url) errors.source_url = "fixed_needs_source";
-    if (typeof body.item_key === "string" && body.item_key && !/^[a-z0-9_]+$/.test(body.item_key)) errors.item_key = "slug";
+    if (typeof body.item_key === "string" && body.item_key && !ITEM_KEY_RE.test(body.item_key)) errors.item_key = "slug";
+    if (body.source === SAMPLE_SOURCE && (body.is_sample !== true || body.is_fixed_by_law === true)) errors.is_sample = "sample_source";
   } else {
+    if (typeof body.phone === "string" && body.phone && !PHONE_RE.test(body.phone)) errors.phone = "phone_format";
     if (body.phone && !body.source_url && !errors.source_url) errors.source_url = "phone_needs_source";
     if (body.phone && !body.verified_at && !errors.verified_at) errors.verified_at = "phone_needs_verified";
+    if (body.is_sample === true) {
+      if (typeof body.name === "string" && body.name && !body.name.startsWith(SAMPLE_NAME_PREFIX)) errors.name = "sample_name";
+      for (const k of ["phone", "website", "google_maps_url"] as const) {
+        const v = values[k];
+        // The more useful message for a fictional business: remove the contact, not reformat it.
+        if (typeof v === "string" && v.trim()) errors[k] = "sample_no_contact";
+      }
+    }
   }
   return Object.keys(errors).length ? { ok: false, errors } : { ok: true, body: body as Body<E> };
 }

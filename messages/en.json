@@ -413,7 +413,7 @@
       "fixed_needs_source": "A price fixed by law needs a source link.",
       "phone_needs_source": "A phone number needs a source link.",
       "phone_needs_verified": "A phone number needs a verification date.",
-      "slug": "Use lowercase letters, digits and _ only.",
+      "slug": "Use lowercase letters and digits, with single _ between words (e.g. taxi_airport_patong).",
       "formHasErrors": "Please fix the highlighted fields.",
       "network": "Connection problem. Please try again.",
       "unauthorized": "Please sign in again (reload the page).",
@@ -421,7 +421,13 @@
       "not_found": "This row no longer exists. Reload the list.",
       "conflict": "A row with the same item, area, source and date already exists.",
       "invalid": "The server did not accept this change.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "decimals": "Use at most 2 decimals.",
+      "too_large": "The amount must be below 100,000,000.",
+      "phone_format": "Use a short code (e.g. 1155) or the \"+66 XX XXX XXX\" format.",
+      "sample_name": "A sample business name must start with \"[SAMPLE] \".",
+      "sample_no_contact": "A sample business is fictional: leave this empty.",
+      "sample_source": "Source \"SAMPLE DATA\" needs \"Sample data (not real)\" on and \"Price is fixed by law\" off."
     }
   }
 }

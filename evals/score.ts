@@ -83,8 +83,46 @@ export type QuestionScore = {
   emergency_ok: boolean | null;
   source_slugs: string[];
   draft_sources: number;
+  /** Highest source similarity in the trailer (null when no sources). */
+  top_similarity: number | null;
+  /** Model planning/thinking text that leaked into the answer (heuristic; reported, not a gate). */
+  thinking_leak: string[];
+  /** The answer prose (before the sources delimiter), kept for human review. */
+  answer: string;
+  /** Chat model that answered: the primary, or its fallback if lib/ai/fallback.ts switched. null in --url mode. */
+  model_used: string | null;
   failures: string[];
 };
+
+const FALLBACK_LOG = /^\[ai\] (\S+) failed \(.*\); falling back to (\S+)\s*$/;
+
+/**
+ * Chat model that answered one question, from the primary chat model id and the warnings logged while it ran
+ * (lib/ai/fallback.ts logs "[ai] <primary> failed (...); falling back to <fallback>"). A fallback of another
+ * model (e.g. the fast model) doesn't change the answer model. null when the primary is unknown (--url mode).
+ */
+export function modelUsed(primaryId: string | null, logs: readonly string[]): string | null {
+  if (!primaryId) return null;
+  for (const line of logs) {
+    const m = FALLBACK_LOG.exec(line);
+    if (m && m[1] === primaryId) return m[2]!;
+  }
+  return primaryId;
+}
+
+/** Lines that look like model planning rather than an answer to the tourist (seen once on Gemini). */
+const LEAK_PATTERNS: RegExp[] = [
+  /^\s*(okay|ok|alright|so)[,.]?\s+(let me|let's|i (need|will|should))\b/im,
+  /^\s*(let me|i need to|i will now|i should)\s+(think|check|look|plan|draft|structure|answer|write|figure)/im,
+  /\bthe user (is asking|asks|wants|question)\b/i,
+  /^\s*(\*\*)?(thinking|thought|plan|planning|draft|step \d+)(\*\*)?\s*:/im,
+  /<\/?(think|thinking|thought)>/i,
+  /用户(问|想|询问|的问题)/,
+  /(我需要|让我)(先)?(思考|检查|规划|组织|起草)/,
+];
+export function thinkingLeaks(answer: string): string[] {
+  return LEAK_PATTERNS.filter((r) => r.test(answer)).map((r) => (answer.match(r)?.[0] ?? "").trim().slice(0, 60));
+}
 
 export function scoreAnswer(q: EvalQuestion, status: number, body: string): QuestionScore {
   const p = parseChatStream(body);
@@ -118,6 +156,10 @@ export function scoreAnswer(q: EvalQuestion, status: number, body: string): Ques
     emergency_ok: q.expect_emergency ? p.trailer?.meta.is_emergency === true : null,
     source_slugs: slugs,
     draft_sources: sources.filter((x) => x.status === "DRAFT").length,
+    top_similarity: sources.length ? Math.max(...sources.map((x) => x.similarity)) : null,
+    thinking_leak: thinkingLeaks(p.answer),
+    answer: p.answer,
+    model_used: null,
     failures: [],
   };
   const f = s.failures;

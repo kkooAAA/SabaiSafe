@@ -28,7 +28,27 @@ describe("repo safety", () => {
   it("client components never import lib/db or lib/ai", () => {
     const bad = files
       .filter((f) => isClient(src(f)))
-      .filter((f) => /from\s+["'](@\/|\.{1,2}\/)+(lib\/)?(db|ai)(\/|["'])/.test(src(f)) || /["']@\/lib\/(db|ai)/.test(src(f)));
+      // Only exception (lead, P4-3): the pure validation module @/lib/db/schema (checked below).
+      .map((f) => [f, src(f).replace(/["']@\/lib\/db\/schema["']/g, '"<schema>"')] as const)
+      .filter(([, code]) => /from\s+["'](@\/|\.{1,2}\/)+(lib\/)?(db|ai)(\/|["'])/.test(code) || /["']@\/lib\/(db|ai)/.test(code))
+      .map(([f]) => f);
+    expect(bad.map(rel)).toEqual([]);
+  });
+
+  it("lib/db/schema.ts (importable by the admin client) imports only zod and @/types/*", () => {
+    const code = src(join(ROOT, "lib", "db", "schema.ts"));
+    const specs = [...code.matchAll(/(?:^|\n)\s*(?:import|export)\s[^;]*?from\s+["']([^"']+)["']|\bimport\(\s*["']([^"']+)["']|\brequire\(\s*["']([^"']+)["']/g)].map(
+      (m) => m[1] ?? m[2] ?? m[3],
+    );
+    expect(specs.length).toBeGreaterThan(0);
+    expect(specs.filter((s) => s !== "zod" && !/^@\/types\/[\w-]+$/.test(s!))).toEqual([]);
+    expect(code).not.toMatch(/process\.env|server-only/);
+  });
+
+  it("only the admin UI imports @/lib/db/schema from client-side folders (keeps zod out of public pages)", () => {
+    const bad = files
+      .filter((f) => /^(components|app\/\[locale\]|i18n)\//.test(rel(f)) && !rel(f).startsWith("components/admin/"))
+      .filter((f) => /["'](@\/|(\.\.\/)+)lib\/db\/schema["']/.test(src(f)));
     expect(bad.map(rel)).toEqual([]);
   });
 

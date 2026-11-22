@@ -16,7 +16,9 @@ const config = [
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [{ group: ["@/lib/db/*", "@/lib/ai/*", "**/lib/db/*", "**/lib/ai/*"], message: "Call the HTTP API instead (contracts §4)." }] },
+        // Exception: lib/db/schema.ts is pure (zod + types/api only), so the admin form can reuse the
+        // server's validation rules. Keep it free of server-only imports.
+        { patterns: [{ group: ["@/lib/db/*", "@/lib/ai/*", "**/lib/db/*", "**/lib/ai/*", "!@/lib/db/schema"], message: "Call the HTTP API instead (contracts §4)." }] },
       ],
     },
   },

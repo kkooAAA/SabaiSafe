@@ -2,7 +2,24 @@
 
 Newest first. One short entry per finished task: date, teammate, what changed, how it was checked.
 
-## 2026-11-21 — frontend — P4-1 Trusted Services, P4-3 Admin UI, P4-4 polish/a11y (review, handed to qa)
+## 2026-11-23 — qa — P4-5 full eval + final qa report; P4-1, P4-3, P4-4 approved
+- Review: P4-1 OK (name order only, Sponsored label on every sponsored card in en + zh, legend, disclaimer). P4-3: found 6
+  client/server validation gaps (impossible dates, URLs without `//` or with spaces, [SAMPLE] rules, phone format,
+  item_key slug, THB decimals/max). frontend fixed them by importing the constants from `lib/db/schema.ts`. Re-reviewed, OK.
+  P4-4 OK (skip link → main#main, aria-live/aria-busy on Legal/Price/Report).
+- New tests: `tests/trusted-admin-parity.test.tsx` (server rejects ⇒ client rejects on the same field, using the server
+  schemas imported directly; positive controls; area/category lists and form columns equal the schema; option labels in en + zh; no
+  hotline numbers other than 1155/191/1669/1166 in messages or help/admin/shared/shell code; en vs zh order is the same; shell a11y).
+  repo-safety: `lib/db/schema.ts` imports only zod + `@/types/*`, and only `components/admin/**` imports it from client folders.
+  evals: results now record `answer`, `top_similarity` and a `thinking_leak` heuristic (reported, not a gate), with tests.
+- Checked: typecheck, lint, test 43 files / 1343. Mock eval: all gates passed (hit 64%, not meaningful in mock; OOS refused,
+  disclaimer, citations, language, emergency, complete 100%; 0 invented numbers). Report eval mock 3/3. Live Gemini sample
+  (6 ids, one run): 6/6 pass, hit 100%, MRR 1.00. One 503 on gemini-3.5-flash was handled by the app's built-in
+  one-shot fallback to flash-lite. Results are in `evals/results/` (gitignored).
+  NOT checked: live answer text, similarity and thinking leaks (the runner did not save them yet; added for next run);
+  real Supabase; screen reader; live report/price flows.
+
+## 2026-11-21 — frontend — P4-1 Trusted Services, P4-3 Admin UI, P4-4 polish/a11y (done, qa approved 2026-11-23)
 - P4-1 (/help#trusted, `components/help/BusinessDirectory.tsx`): order by `name` only via `orderBusinesses`
   (en collation, base sensitivity, id tiebreak; sponsorship never reorders; inactive dropped), category chips,
   translated criteria chips (`metCriteria`), Sponsored + Sample labels, "not an endorsement" note, and a
@@ -25,6 +42,11 @@ Newest first. One short entry per finished task: date, teammate, what changed, h
   no nameless buttons/links, no text below WCAG AA contrast, no duplicate ids, no raw keys, no console errors.
   Regression: report 72/72, AI-busy 18/18.
   NOT checked: real Supabase admin writes; screen reader pass (structure only); keyboard-only walk-through by hand.
+- 2026-11-23 qa fix (P4-3 client/server parity): admin-form now imports PHONE_RE, AREAS and categories from
+  `@/lib/db/schema` (lead's ESLint exception for exactly that module; constants only, no zod schemas) and mirrors
+  isoDate, the httpUrl regex, the item_key regex, THB ≤ 2 decimals / ≤ 99,999,999.99 and the [SAMPLE] rules. There are
+  6 new admin.errors keys (en + zh). Checked: typecheck, lint, test 43 files / 1330 (incl. qa's trusted-admin-parity);
+  `next start` copy, headless Chrome 375 px en + zh 34/34 (errors under the right field, no write request sent).
 
 ## 2026-11-21 — backend — P4-2 admin API + next-dev report store fix (done, qa approved)
 - `/api/admin/{prices,businesses}` GET/POST and `/:id` PATCH/DELETE per contracts §3.9 v0.6 (`lib/db/admin.ts`,

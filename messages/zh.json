@@ -413,7 +413,7 @@
       "fixed_needs_source": "法定价格需要来源链接。",
       "phone_needs_source": "电话号码需要来源链接。",
       "phone_needs_verified": "电话号码需要核实日期。",
-      "slug": "只能使用小写字母、数字和 _。",
+      "slug": "只能使用小写字母和数字，单词之间用单个 _ 分隔（例如 taxi_airport_patong）。",
       "formHasErrors": "请修正标出的字段。",
       "network": "网络连接有问题，请重试。",
       "unauthorized": "请重新登录（刷新页面）。",
@@ -421,7 +421,13 @@
       "not_found": "这一行已不存在。请刷新列表。",
       "conflict": "已存在相同项目、区域、来源和日期的行。",
       "invalid": "服务器未接受此更改。",
-      "generic": "出现问题，请重试。"
+      "generic": "出现问题，请重试。",
+      "decimals": "最多保留 2 位小数。",
+      "too_large": "金额必须小于 100,000,000。",
+      "phone_format": "请使用短号（如 1155）或“+66 XX XXX XXX”格式。",
+      "sample_name": "示例商家的名称必须以“[SAMPLE] ”开头。",
+      "sample_no_contact": "示例商家是虚构的：此项请留空。",
+      "sample_source": "来源为“SAMPLE DATA”时，须勾选“示例数据（非真实）”，且不能勾选“价格由法律规定”。"
     }
   }
 }

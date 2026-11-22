@@ -15,7 +15,7 @@
 import { config as loadEnv } from "dotenv";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { hardFailures, scoreAnswer, summarize, type EvalQuestion, type QuestionScore } from "./score";
+import { hardFailures, modelUsed, scoreAnswer, summarize, type EvalQuestion, type QuestionScore } from "./score";
 
 loadEnv({ path: [".env.local", ".env"], quiet: true });
 
@@ -117,10 +117,30 @@ async function main() {
     }
   };
 
+  // Primary chat model id (in-process only; the fallback wrapper reports the primary's id). Building the model
+  // makes no network call. null when unknown (--url mode, or no key).
+  let primaryChatId: string | null = null;
+  if (route) {
+    try {
+      const m = (await import("@/lib/ai/provider")).chatModel();
+      primaryChatId = typeof m === "string" ? m : m.modelId;
+    } catch {
+      primaryChatId = null;
+    }
+  }
+  // Warnings logged while one question runs (lib/ai/fallback.ts), passed through to the console as before.
+  let warnLog: string[] = [];
+  const origWarn = console.warn;
+  console.warn = (...a: unknown[]) => {
+    warnLog.push(a.map(String).join(" "));
+    origWarn(...a);
+  };
+
   console.log(`SabaiSafe Legal Guide eval: ${questions.length} questions, mode ${args.url ? `HTTP ${args.url}` : mock ? "MOCK (in-process)" : `REAL in-process (${process.env.AI_PROVIDER || "anthropic"})`}`);
   const scores: QuestionScore[] = [];
   for (const q of questions) {
     let s: QuestionScore;
+    warnLog = [];
     try {
       const { status, body } = await ask(q);
       s = scoreAnswer(q, status, body);
@@ -128,11 +148,13 @@ async function main() {
       s = scoreAnswer(q, 0, "");
       s.failures.unshift(`threw: ${(e as Error).message}`);
     }
+    s.model_used = modelUsed(primaryChatId, warnLog);
     scores.push(s);
-    console.log(`${s.failures.length ? "FAIL" : "ok  "} ${q.id.padEnd(6)} ${s.source_slugs.slice(0, 3).join(",") || "-"}${s.failures.length ? `  <- ${s.failures.join("; ")}` : ""}`);
+    console.log(`${s.failures.length ? "FAIL" : "ok  "} ${q.id.padEnd(6)} ${s.source_slugs.slice(0, 3).join(",") || "-"}${s.top_similarity === null ? "" : `  top ${s.top_similarity.toFixed(2)}`}${s.thinking_leak.length ? `  LEAK? ${JSON.stringify(s.thinking_leak)}` : ""}${s.failures.length ? `  <- ${s.failures.join("; ")}` : ""}`);
     if (args.delay > 0) await new Promise((r) => setTimeout(r, args.delay));
   }
 
+  console.warn = origWarn;
   const sum = summarize(scores);
   const pct = (x: number | null) => (x === null ? "n/a" : `${(x * 100).toFixed(0)}%`);
   console.log("\nSummary");
