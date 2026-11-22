@@ -35,6 +35,15 @@ describe("repo safety", () => {
     expect(bad.map(rel)).toEqual([]);
   });
 
+  it("SAMPLE_REPORTS_IN_MEMORY=1 is test-only: never enabled in .env.example, vercel.json or CI deploy config", () => {
+    // With it set, lib/db/reports.ts keeps reports in memory even when Supabase is configured (found 2026-11-23).
+    const on = /^\s*SAMPLE_REPORTS_IN_MEMORY\s*[=:]\s*["']?1/m;
+    expect(src(join(ROOT, ".env.example"))).not.toMatch(on);
+    const wf = join(ROOT, ".github", "workflows");
+    const configs = [join(ROOT, "vercel.json"), ...(existsSync(wf) ? readdirSync(wf).map((f) => join(wf, f)) : [])].filter(existsSync);
+    for (const f of configs) expect(src(f), rel(f)).not.toMatch(/SAMPLE_REPORTS_IN_MEMORY["']?\s*[=:]\s*["']?1/);
+  });
+
   it("lib/db/schema.ts (importable by the admin client) imports only zod and @/types/*", () => {
     const code = src(join(ROOT, "lib", "db", "schema.ts"));
     const specs = [...code.matchAll(/(?:^|\n)\s*(?:import|export)\s[^;]*?from\s+["']([^"']+)["']|\bimport\(\s*["']([^"']+)["']|\brequire\(\s*["']([^"']+)["']/g)].map(

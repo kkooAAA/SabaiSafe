@@ -2,6 +2,23 @@
 
 Newest first. One short entry per finished task: date, teammate, what changed, how it was checked.
 
+## 2026-11-23 — qa — DB-mode verification on the real Supabase project (production; no chat/generate calls)
+- `next build` + `next start` (repo copy, DB mode, SAMPLE_REPORTS_IN_MEMORY=0 for the run): 56/56 HTTP/REST checks pass,
+  plus 6/6 match_legal checks.
+- Public: /api/price 32 rows, item=jetski|jet-ski|Jet Ski are the same, area=Patong ⇒ Patong + Phuket, `---` ⇒ 0; /api/help 17 contacts + 6
+  businesses, category filter, bad category 400; both `public, s-maxage=60, stale-while-revalidate=60`.
+- Admin (Basic auth, X-Admin-Persisted true, no-store): price POST 201 / PATCH / DELETE 204 / 404 again; 409 duplicate;
+  400 fields (min>max, merged PATCH, unknown key, [SAMPLE] phone); business POST/PATCH/soft DELETE. The public routes
+  showed the change right away; anon REST can't see the inactive row.
+- match_legal (anon RPC, one embedding batch): in-scope top 0.68–0.80 (en + zh, expected doc first), off-topic 0.57
+  (< 0.62); the lang filter is respected, and null returns both languages.
+- Reports: consent false / "true" ⇒ consent_required, old version ⇒ consent_outdated; save 201, expires_at +30.000 d,
+  only the sha256 is stored; GET 200 / wrong or missing token 404; DELETE 204 ⇒ 404; anon REST select/insert/delete ⇒ 401 42501.
+  pg_cron: the cron schema is not exposed over REST (PGRST106), so this needs a dashboard SQL check.
+- Cleanup by recorded id + final pattern check: 0 test rows; counts back to prices 32, businesses 6, help_contacts 17,
+  reports 0, legal_chunks 128.
+- Found: `.env.local` has `SAMPLE_REPORTS_IN_MEMORY=1`, which makes DB mode keep reports in memory (reported to lead).
+
 ## 2026-11-23 — qa — P4-5 full eval + final qa report; P4-1, P4-3, P4-4 approved
 - Review: P4-1 OK (name order only, Sponsored label on every sponsored card in en + zh, legend, disclaimer). P4-3: found 6
   client/server validation gaps (impossible dates, URLs without `//` or with spaces, [SAMPLE] rules, phone format,
