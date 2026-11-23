@@ -23,11 +23,11 @@ export const RIBBON_BG: Record<Ribbon, string> = {
 
 /** Left accent stripe for a feature page h1; hangs in the page gutter so the text stays aligned. */
 export const RIBBON_TITLE: Record<Ribbon, string> = {
-  ink: "-ml-4 border-l-4 border-ink pl-3",
-  legal: "-ml-4 border-l-4 border-ribbon-legal pl-3",
-  report: "-ml-4 border-l-4 border-ribbon-report pl-3",
-  price: "-ml-4 border-l-4 border-ribbon-price pl-3",
-  help: "-ml-4 border-l-4 border-ribbon-help pl-3",
+  ink: "-ml-4 border-l-4 border-ink pl-3 md:-ml-6 md:pl-5 lg:-ml-8 lg:pl-7",
+  legal: "-ml-4 border-l-4 border-ribbon-legal pl-3 md:-ml-6 md:pl-5 lg:-ml-8 lg:pl-7",
+  report: "-ml-4 border-l-4 border-ribbon-report pl-3 md:-ml-6 md:pl-5 lg:-ml-8 lg:pl-7",
+  price: "-ml-4 border-l-4 border-ribbon-price pl-3 md:-ml-6 md:pl-5 lg:-ml-8 lg:pl-7",
+  help: "-ml-4 border-l-4 border-ribbon-help pl-3 md:-ml-6 md:pl-5 lg:-ml-8 lg:pl-7",
 };
 
 export function ribbonOf(key: NavKey): Ribbon {

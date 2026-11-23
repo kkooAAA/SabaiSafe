@@ -26,7 +26,7 @@ export function PriceExplorer({ rows }: { rows: PriceRef[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3">
+      <div className="grid gap-3 md:max-w-2xl md:grid-cols-2">
         <label className="grid gap-1 text-sm font-medium">
           {t("itemLabel")}
           <select className={selectCls} value={item} onChange={(e) => setItem(e.target.value)}>
@@ -55,7 +55,9 @@ export function PriceExplorer({ rows }: { rows: PriceRef[] }) {
         </label>
       </div>
       {item && (
-        <PriceCheck key={item} itemKey={item} area={area || null} itemRows={filterPrices(rows, item, null)} lang={lang} />
+        <div className="md:max-w-2xl">
+          <PriceCheck key={item} itemKey={item} area={area || null} itemRows={filterPrices(rows, item, null)} lang={lang} />
+        </div>
       )}
       <p className="text-sm text-muted-foreground" aria-live="polite">
         {t("resultCount", { count: shown.length })}
@@ -63,7 +65,7 @@ export function PriceExplorer({ rows }: { rows: PriceRef[] }) {
       {shown.length === 0 ? (
         <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">{t("noResults")}</p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 md:[&>li>*]:h-full">
           {shown.map((r) => (
             <li key={r.id}>
               <PriceCard row={r} />

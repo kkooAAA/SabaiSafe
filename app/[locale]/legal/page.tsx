@@ -19,7 +19,7 @@ export default async function LegalPage({ params }: Props) {
     <div className="space-y-5">
       <section>
         <h1 className={`text-title font-bold ${RIBBON_TITLE.legal}`}>{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("intro")}</p>
+        <p className="mt-1 max-w-prose text-sm text-muted-foreground">{t("intro")}</p>
       </section>
       <LegalGuide />
     </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { UiLang } from "@/types/api";
 import { postTextStream } from "@/components/shared/text-stream";
 import { ConfirmButton } from "@/components/shared/ConfirmButton";
@@ -183,7 +184,8 @@ export function ReportAssistant() {
   const summaryIsSaved = summaryExpires !== null;
 
   return (
-    <div ref={topRef} className="scroll-mt-28 space-y-4" data-step={step}>
+    // md+: the notice and the chat keep a comfortable reading width (~42rem); the summary step uses the full width at lg.
+    <div ref={topRef} className={cn("scroll-mt-28 space-y-4", step !== "summary" && "md:max-w-2xl")} data-step={step}>
       {flash && (
         <p
           role="status"
@@ -221,45 +223,54 @@ export function ReportAssistant() {
       )}
 
       {step === "summary" && summary && (
-        <section aria-labelledby="summary-h" className="space-y-4" data-testid="report-summary">
-          <h2 id="summary-h" className="text-lg font-semibold">
+        // lg: the summary (~70ch) on the left; save / delete and the actions in a sticky column on the right.
+        <section
+          aria-labelledby="summary-h"
+          className="space-y-4 lg:grid lg:grid-cols-[minmax(0,70ch)_minmax(18rem,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-4 lg:space-y-0"
+          data-testid="report-summary"
+        >
+          <h2 id="summary-h" className="text-lg font-semibold lg:col-span-2">
             {summaryIsSaved ? t("summary.savedCopy", { date: formatDate(summaryExpires, locale) }) : t("summary.title")}
           </h2>
-          <SummaryPreview summary={summary} />
-          {summaryIsSaved && record ? (
-            <SavedReportPanel saved={record} mode={savedMode} showOpen={false} onOpened={onOpened} onGone={onGone} />
-          ) : summaryIsSaved ? null : (
-            <SaveReport
-              key={summary.markdown}
-              summary={summary}
-              lang={lang}
-              previous={record}
-              onSaved={onSaved}
-              onPreviousGone={() => {
-                setSaved(null);
-                setNoStorageRecord(null);
-              }}
-            />
-          )}
-          <div className="flex flex-wrap gap-2">
-            {messages.length > 0 && (
-              <button
-                type="button"
-                onClick={() => goTo("chat")}
-                className="inline-flex h-11 items-center gap-1.5 rounded-md border bg-background px-4 text-sm font-medium"
-                data-testid="report-back-to-chat"
-              >
-                <ArrowLeft className="size-4" aria-hidden />
-                {t("summary.backToChat")}
-              </button>
+          <div className="lg:col-start-1">
+            <SummaryPreview summary={summary} />
+          </div>
+          <div className="space-y-4 lg:sticky lg:top-36 lg:col-start-2 lg:row-start-2">
+            {summaryIsSaved && record ? (
+              <SavedReportPanel saved={record} mode={savedMode} showOpen={false} onOpened={onOpened} onGone={onGone} />
+            ) : summaryIsSaved ? null : (
+              <SaveReport
+                key={summary.markdown}
+                summary={summary}
+                lang={lang}
+                previous={record}
+                onSaved={onSaved}
+                onPreviousGone={() => {
+                  setSaved(null);
+                  setNoStorageRecord(null);
+                }}
+              />
             )}
-            <ConfirmButton
-              label={t("summary.newReport")}
-              question={t("chat.confirmStartOver")}
-              confirmLabel={t("chat.startOver")}
-              onConfirm={startOver}
-              testId="report-new"
-            />
+            <div className="flex flex-wrap gap-2">
+              {messages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => goTo("chat")}
+                  className="inline-flex h-11 items-center gap-1.5 rounded-md border bg-background px-4 text-sm font-medium"
+                  data-testid="report-back-to-chat"
+                >
+                  <ArrowLeft className="size-4" aria-hidden />
+                  {t("summary.backToChat")}
+                </button>
+              )}
+              <ConfirmButton
+                label={t("summary.newReport")}
+                question={t("chat.confirmStartOver")}
+                confirmLabel={t("chat.startOver")}
+                onConfirm={startOver}
+                testId="report-new"
+              />
+            </div>
           </div>
         </section>
       )}

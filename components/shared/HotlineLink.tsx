@@ -33,12 +33,12 @@ export function HotlineLink({ number, label, className, variant = "strip" }: Pro
       href={telHref(number)}
       aria-label={`${label} ${number}`}
       className={cn(
-        "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-md bg-black/15 px-1 py-1 leading-tight active:bg-black/30",
+        "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-md bg-black/15 px-1 py-1 leading-tight active:bg-black/30 md:flex-none md:flex-row md:gap-2 md:px-3",
         className,
       )}
     >
       <span className="text-base font-bold tabular-nums">{number}</span>
-      <span className="w-full truncate text-center text-xs">{label}</span>
+      <span className="w-full truncate text-center text-xs md:w-auto md:text-sm">{label}</span>
     </a>
   );
 }

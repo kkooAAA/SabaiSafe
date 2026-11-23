@@ -32,6 +32,7 @@ const { default: Home } = await import("@/app/[locale]/page");
 const { LocaleSwitch } = await import("@/components/shell/LocaleSwitch");
 const { BottomNav } = await import("@/components/shell/BottomNav");
 const { SummaryPreview } = await import("@/components/report/SummaryPreview");
+const { HeaderNav } = await import("@/components/shell/HeaderNav");
 
 const wrap = (locale: "en" | "zh", el: ReactElement) =>
   renderToStaticMarkup(
@@ -107,7 +108,8 @@ describe.each(["en", "zh"] as const)("home (%s)", (locale) => {
   const d = doc(wrap(locale, <Home params={params} />));
 
   it("renders 4 feature rows in situation order, each with its ribbon stripe", () => {
-    const rows = [...d.querySelectorAll("ul > li > a")];
+    // Feature rows only: scoped so a desktop hotline ul/li (tel: links) can sit next to them.
+    const rows = [...d.querySelectorAll('ul > li > a:not([href^="tel:"])')];
     expect(rows.map((a) => a.getAttribute("href"))).toEqual(["/price", "/legal", "/report", "/help"]);
     rows.forEach((a, i) => {
       const key = (["price", "legal", "report", "help"] as const)[i]!;
@@ -174,5 +176,39 @@ describe("Thai report preview font", () => {
     expect(d.querySelector('[data-testid="report-en"]')!.className).not.toContain("font-thai");
     const css = readFileSync("app/globals.css", "utf8");
     expect(css).toMatch(/--font-thai: var\(--font-sarabun\)/);
+  });
+});
+
+describe.each(["en", "zh"] as const)("responsive shell (%s)", (locale) => {
+  it("BottomNav is hidden from md up; HeaderNav only shows from md up", () => {
+    const bottom = doc(wrap(locale, <BottomNav />)).querySelector("nav")!;
+    expect(bottom.className.split(" ")).toContain("md:hidden");
+    const header = doc(wrap(locale, <HeaderNav />)).querySelector("nav")!;
+    expect(header.className.split(" ")).toEqual(expect.arrayContaining(["hidden", "md:block"]));
+    expect(header.getAttribute("aria-label")).toBe(MESSAGES[locale].nav.label);
+  });
+
+  it.each([
+    ["/", null],
+    ["/legal", "legal"],
+    ["/report", "report"],
+    ["/price/x", "price"],
+    ["/help", "help"],
+  ] as const)("HeaderNav at %s: 4 feature links, aria-current only on %s, localized labels", (path, key) => {
+    pathname = path;
+    const d = doc(wrap(locale, <HeaderNav />));
+    const links = [...d.querySelectorAll("a")];
+    expect(links.map((a) => a.getAttribute("href"))).toEqual(["/legal", "/report", "/price", "/help"]);
+    expect(links.map((a) => a.textContent)).toEqual(["legal", "report", "price", "help"].map((k) => MESSAGES[locale].nav[k as "legal"]));
+    const cur = links.filter((a) => a.getAttribute("aria-current") === "page");
+    if (key === null) {
+      expect(cur).toHaveLength(0);
+    } else {
+      expect(cur).toHaveLength(1);
+      expect(cur[0]!.getAttribute("href")).toBe(NAV_ITEMS.find((n) => n.key === key)!.href);
+      expect(cur[0]!.className).toContain("font-bold"); // not colour-only
+      expect(cur[0]!.querySelector("span[aria-hidden]")?.className).toContain(RIBBON_BG[ribbonOf(key)]);
+    }
+    pathname = "/";
   });
 });

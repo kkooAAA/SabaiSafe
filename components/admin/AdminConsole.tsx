@@ -147,7 +147,7 @@ export function AdminConsole() {
 
       {mode.kind === "list" ? (
         <>
-          <div role="tablist" aria-label={t("tabsLabel")} className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+          <div role="tablist" aria-label={t("tabsLabel")} className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 md:max-w-md">
             {tabs.map((e) => (
               <button
                 key={e}
@@ -169,7 +169,7 @@ export function AdminConsole() {
           </div>
 
           <div role="tabpanel" className="space-y-3">
-            <div className="flex gap-2">
+            <div className="flex gap-2 md:max-w-2xl">
               <label className="relative min-w-0 flex-1">
                 <span className="sr-only">{t("search")}</span>
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
@@ -224,7 +224,7 @@ export function AdminConsole() {
                 {shown.length === 0 ? (
                   <p className="text-sm text-muted-foreground">{t("empty")}</p>
                 ) : (
-                  <ul className="grid gap-2" data-testid="admin-rows">
+                  <ul className="grid gap-2 md:grid-cols-2 lg:grid-cols-3" data-testid="admin-rows">
                     {shown.map((r) => (
                       <li key={r.id} className="space-y-2 rounded-lg border bg-card p-3" data-testid="admin-row" data-id={r.id}>
                         {"item_key" in r ? (
@@ -285,7 +285,7 @@ export function AdminConsole() {
           </div>
         </>
       ) : (
-        <form onSubmit={submit} noValidate className="space-y-4" data-testid="admin-form">
+        <form onSubmit={submit} noValidate className="max-w-2xl space-y-4" data-testid="admin-form">
           <button
             type="button"
             onClick={() => open({ kind: "list" })}

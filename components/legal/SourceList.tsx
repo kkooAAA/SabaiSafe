@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { ExternalLink } from "lucide-react";
+import { ChevronDown, ExternalLink } from "lucide-react";
 import type { LegalSource } from "@/types/api";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { safeUrl } from "@/components/shared/format";
@@ -29,7 +29,8 @@ export function SourceList({ sources }: { sources: readonly LegalSource[] }) {
                 <span className="shrink-0 rounded bg-accent px-1.5 text-xs font-semibold leading-5 text-primary">
                   [{s.id}]
                 </span>
-                <span className="min-w-0 flex-1 font-medium leading-snug [overflow-wrap:anywhere]">{s.title}</span>
+                {/* Grows from 10rem: when the line is too narrow for title + badge, the badge wraps under the title. */}
+                <span className="min-w-0 flex-[1_1_10rem] font-medium leading-snug break-words">{s.title}</span>
                 {s.status === "VERIFIED" ? <StatusBadge kind="verified" /> : <StatusBadge kind="draft" />}
               </div>
               {(s.law || s.law_th) && (
@@ -54,9 +55,13 @@ export function SourceList({ sources }: { sources: readonly LegalSource[] }) {
                   )}
                 </p>
               )}
-              {s.excerpt && (
-                <details className="mt-1">
-                  <summary className="flex min-h-11 cursor-pointer items-center text-xs text-primary">{t("excerpt")}</summary>
+              {s.excerpt?.trim() && (
+                // The summary is display:flex (no native marker), so a chevron shows it is a disclosure, not an empty heading.
+                <details className="group mt-1">
+                  <summary className="flex min-h-11 cursor-pointer items-center gap-1 text-xs text-primary">
+                    {t("excerpt")}
+                    <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" aria-hidden />
+                  </summary>
                   <p className="mt-1 text-xs whitespace-pre-line [overflow-wrap:anywhere]">{s.excerpt}</p>
                 </details>
               )}

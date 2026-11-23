@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { EmergencyStrip } from "./EmergencyStrip";
+import { CONTAINER } from "./container";
+import { HeaderNav } from "./HeaderNav";
 import { LocaleSwitch } from "./LocaleSwitch";
 import { NAV_ITEMS, RIBBON_BG } from "./nav-items";
 
@@ -17,8 +19,8 @@ export function Header() {
       >
         {t("skipToContent")}
       </a>
-      <div className="mx-auto flex max-w-md items-center justify-between gap-2 px-4 py-2">
-        <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-md text-xl font-bold leading-none">
+      <div className={`${CONTAINER} flex items-center justify-between gap-2 py-2 md:gap-6`}>
+        <Link href="/" className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-md text-xl font-bold leading-none">
           {/* The four ribbons tied to the bow: one per feature. */}
           <span aria-hidden className="flex h-6 items-stretch gap-[3px]">
             {FEATURE_RIBBONS.map((r) => (
@@ -27,6 +29,7 @@ export function Header() {
           </span>
           <span>{t("name")}</span>
         </Link>
+        <HeaderNav />
         <LocaleSwitch />
       </div>
       <EmergencyStrip />

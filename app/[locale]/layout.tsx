@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/shell/Header";
 import { BottomNav } from "@/components/shell/BottomNav";
+import { CONTAINER } from "@/components/shell/container";
 import { fontVariables } from "./fonts";
 import "../globals.css";
 
@@ -35,7 +36,7 @@ export default async function LocaleLayout({
       <body className="min-h-dvh font-sans">
         <NextIntlClientProvider>
           <Header />
-          <main id="main" tabIndex={-1} className="mx-auto w-full max-w-md px-4 pb-24 pt-4 focus:outline-none">{children}</main>
+          <main id="main" tabIndex={-1} className={`${CONTAINER} pb-24 pt-4 focus:outline-none md:pb-12 md:pt-6 lg:pt-8`}>{children}</main>
           <BottomNav />
         </NextIntlClientProvider>
       </body>

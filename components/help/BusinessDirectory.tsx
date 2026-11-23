@@ -24,12 +24,12 @@ export function BusinessDirectory({ businesses }: { businesses: Business[] }) {
       <h2 id="biz-h" className="text-lg font-semibold">
         {t("businessesTitle")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("businessesNote")}</p>
-      <p className="flex gap-2 rounded-lg border bg-muted/50 p-3 text-xs" data-testid="trusted-disclaimer">
+      <p className="max-w-prose text-sm text-muted-foreground">{t("businessesNote")}</p>
+      <p className="flex max-w-prose gap-2 rounded-lg border bg-muted/50 p-3 text-xs" data-testid="trusted-disclaimer">
         <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
         <span>{t("notEndorsement")}</span>
       </p>
-      <details className="rounded-lg border bg-card px-3 text-sm" data-testid="criteria-help">
+      <details className="max-w-prose rounded-lg border bg-card px-3 text-sm" data-testid="criteria-help">
         <summary className="flex min-h-11 cursor-pointer items-center font-medium">{t("criteriaHelpTitle")}</summary>
         <dl className="space-y-2 pb-3">
           {BUSINESS_CRITERIA.map((k) => (
@@ -42,7 +42,7 @@ export function BusinessDirectory({ businesses }: { businesses: Business[] }) {
       </details>
 
       {categories.length > 1 && (
-        <div role="group" aria-label={t("filterLabel")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        <div role="group" aria-label={t("filterLabel")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           {chips.map((c) => {
             const active = c === category;
             return (
@@ -66,7 +66,7 @@ export function BusinessDirectory({ businesses }: { businesses: Business[] }) {
       {shown.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("noBusinesses")}</p>
       ) : (
-        <ul className="grid gap-3" aria-live="polite">
+        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 md:[&>li>*]:h-full" aria-live="polite">
           {shown.map((b) => (
             <li key={b.id}>
               <BusinessCard business={b} />

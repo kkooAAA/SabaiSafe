@@ -26,7 +26,7 @@ export function ContactDirectory({
         {t("contactsTitle")}
       </h2>
       {categories.length > 1 && (
-        <div role="group" aria-label={t("filterLabel")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        <div role="group" aria-label={t("filterLabel")} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           {chips.map((c) => {
             const active = c === category;
             return (
@@ -49,7 +49,7 @@ export function ContactDirectory({
       {shown.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("noContacts")}</p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 md:[&>li>*]:h-full">
           {shown.map((c) => (
             <li key={c.id}>
               <ContactCard contact={c} />

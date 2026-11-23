@@ -2,6 +2,37 @@
 
 Newest first. One short entry per finished task: date, teammate, what changed, how it was checked.
 
+## 2026-11-23 — qa — review: responsive layout (md ≥768, lg ≥1024)
+- FAIL on 1 medium issue (frontend). typecheck, lint, test 1382/1382, build (scratchpad copy, mock AI, in-memory data) pass.
+- Rendered next start + headless Chrome at 375/768/1024/1280/1440, en+zh, home, legal, report, price, help, admin:
+  no horizontal scroll anywhere; 375 screenshots byte-identical to qa's earlier 375 set (10/10).
+- Legal at lg with a mock answer + 2 citations; Report summary step at lg via a full mock interview + generate (en/zh,
+  1024/1440). Sticky columns pin at 144px, below the 118px header+strip. Header nav: aria-current, marigold focus on ink.
+- Medium: Legal sources column is ~246px wide at 1024 (65ch answer column + 1fr), so source titles next to the Draft badge
+  break mid-word ("passp/orts") and the column grows to ~890px, taller than a 768px viewport.
+- Tests: design-ribbons home rows selector scoped to non-tel links (real ul/li can return for the desktop hotlines);
+  added BottomNav md:hidden, HeaderNav md-only, 4 links, aria-current, zh labels (12 new tests).
+- Recheck after frontend's fixes: PASS. Legal with sources at 1024/1280/1440: sources 384px, answer 536/664px, titles wrap
+  on word boundaries (2 lines), column 505px fits under the sticky top; example cards equal height per row; home desktop
+  hotlines are ul/li again. 375 still byte-identical (10/10); no horizontal scroll; suite 1382/1382.
+- Lead recheck (incl. SourceList badge wrap + excerpt chevron): PASS. Sources 352px, answer 568px at 1024 and 674px at
+  1280/1440; en titles on 1 line with the badge wrapped under them, zh title + badge on 1 line; column 520px at 1024x768.
+  Excerpts are not empty: expanded, they hold 299/300 (en) and 156/187 (zh) characters.
+- Final recheck (same tree): PASS. Legal with sources at 375/1024/1280/1440, en+zh: chevron visible, Excerpt summary
+  reachable by Tab with a 3px indigo focus ring, Enter opens and Space closes it; no mid-word breaks; no horizontal scroll;
+  375 static pages byte-identical (10/10); suite 1382/1382.
+
+## 2026-11-23 — frontend — responsive layout (tablet md ≥768, desktop lg ≥1024)
+- Shared container (`components/shell/container.ts`: max-w-md / md:max-w-3xl / lg:max-w-6xl, px-4/6/8) for header, strip, main.
+  md+: feature links in the ink header (ribbon underline + aria-current), BottomNav hidden, strip pills inline "1155 Tourist Police".
+- Home: md 2x2 ribbon tiles + full-width Tourist Police block; lg tiles 2/3 + sticky aside (1155 block + other hotlines).
+- Legal lg: answer column 65ch + sticky sources column. Report: notice/chat max 42rem; summary step lg = summary left, save/actions sticky right.
+  Price/Help/Admin: card grids md 2 / lg 3 (hotlines lg 4), chips wrap at md+, reading text max 65ch.
+- Checked: typecheck, lint, test, build (copy); next start + headless Chrome at 375/768/1024/1280/1440, en+zh, 5 pages: no horizontal
+  scroll; 375 screenshots byte-identical to the previous commit.
+- QA fixes: Legal lg grid = answer minmax(0,65ch) + sources minmax(18rem,22rem) (single column without sources); SourceList titles
+  break-words with the badge wrapping under them, excerpt disclosure shows a chevron (and hides when empty); example cards h-full.
+
 ## 2026-11-23 — qa — review: longtail ribbons redesign (tokens/shell/home)
 - PASS. typecheck, lint, test (1370/1370), build all pass. Rendered with `next start` + headless Chrome (CDP) at 375px,
   en + zh, home + 4 feature pages: no horizontal scroll, h1 ribbon stripes correct, ink primary buttons, html lang en/zh-CN.

@@ -12,8 +12,8 @@ export function HotlineList({ hotlines }: { hotlines: readonly Hotline[] }) {
       <h2 id="hotlines-h" className="text-lg font-semibold">
         {t("hotlinesTitle")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("hotlinesNote")}</p>
-      <ul className="grid gap-2">
+      <p className="max-w-prose text-sm text-muted-foreground">{t("hotlinesNote")}</p>
+      <ul className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 md:[&>li>*]:h-full">
         {hotlines.map((h) => (
           <li key={h.key}>
             <HotlineLink variant="card" number={h.number} label={pickLang(locale, h.name_en, h.name_zh)} />

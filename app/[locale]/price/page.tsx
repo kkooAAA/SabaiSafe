@@ -36,7 +36,7 @@ export default async function PricePage({ params }: Props) {
     <div className="space-y-5">
       <section>
         <h1 className={`text-title font-bold ${RIBBON_TITLE.price}`}>{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("intro")}</p>
+        <p className="mt-1 max-w-prose text-sm text-muted-foreground">{t("intro")}</p>
       </section>
       {rows === null ? (
         <p role="status" className="rounded-lg border border-warning-foreground/30 bg-warning p-3 text-sm text-warning-foreground">
@@ -48,7 +48,7 @@ export default async function PricePage({ params }: Props) {
           <PriceExplorer rows={rows} />
         </>
       )}
-      <p className="text-xs text-muted-foreground">{t("disclaimer")}</p>
+      <p className="max-w-prose text-xs text-muted-foreground">{t("disclaimer")}</p>
     </div>
   );
 }
