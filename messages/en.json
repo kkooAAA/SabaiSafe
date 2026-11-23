@@ -17,6 +17,10 @@
     "name": {
       "en": "English",
       "zh": "中文"
+    },
+    "short": {
+      "en": "EN",
+      "zh": "中"
     }
   },
   "emergency": {
@@ -30,25 +34,25 @@
     }
   },
   "home": {
-    "title": "Stay safe in Phuket",
-    "intro": "Know the local rules, check fair prices, and get help fast.",
+    "title": "What do you need?",
+    "call": "Call {number}",
     "disclaimer": "SabaiSafe gives general information, not legal advice. In an emergency, call the numbers above.",
     "tiles": {
+      "price": {
+        "title": "Was I overcharged?",
+        "desc": "Fair Price: reference prices with sources"
+      },
       "legal": {
-        "title": "Legal Guide",
-        "desc": "Thai laws and local rules, with sources"
+        "title": "Is this allowed here?",
+        "desc": "Legal Guide: Thai laws and local rules, with citations"
       },
       "report": {
-        "title": "Report Assistant",
-        "desc": "Prepare a Thai summary to bring to the police"
-      },
-      "price": {
-        "title": "Fair Price",
-        "desc": "Reference prices for taxis, rentals and more"
+        "title": "Write a police report",
+        "desc": "Report Assistant: a Thai summary to bring to the police"
       },
       "help": {
-        "title": "Help & Trusted Services",
-        "desc": "Hotlines, police, hospitals and embassies"
+        "title": "Find help nearby",
+        "desc": "Help: hotlines, police, hospitals and embassies"
       }
     }
   },

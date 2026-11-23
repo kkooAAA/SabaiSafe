@@ -5,9 +5,10 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/shell/Header";
 import { BottomNav } from "@/components/shell/BottomNav";
+import { fontVariables } from "./fonts";
 import "../globals.css";
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#ffffff" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0e2a33" };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -30,7 +31,7 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   return (
-    <html lang={locale === "zh" ? "zh-CN" : "en"}>
+    <html lang={locale === "zh" ? "zh-CN" : "en"} className={fontVariables}>
       <body className="min-h-dvh font-sans">
         <NextIntlClientProvider>
           <Header />

@@ -178,7 +178,7 @@ export function AdminConsole() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t("search")}
-                  className="min-h-11 w-full rounded-md border bg-background py-2 pr-3 pl-9 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                  className="min-h-11 w-full rounded-md border bg-background py-2 pr-3 pl-9 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
                   data-testid="admin-search"
                 />
               </label>

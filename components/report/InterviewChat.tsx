@@ -142,7 +142,7 @@ export function InterviewChat(p: Props) {
             placeholder={t("placeholder")}
             aria-invalid={problem ? true : undefined}
             aria-describedby={problem ? "report-msg-err" : "report-msg-count"}
-            className="w-full min-w-0 resize-y rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            className="w-full min-w-0 resize-y rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
           />
           <div className="flex items-center gap-2">
             <span id="report-msg-count" className="mr-auto text-xs text-muted-foreground tabular-nums">

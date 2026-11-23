@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { FIELDS, type Entity, type FieldErrors, type FieldSpec, type FormValues } from "./admin-form";
 
 const inputCls =
-  "w-full min-w-0 rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none aria-[invalid=true]:border-destructive";
+  "w-full min-w-0 rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none aria-[invalid=true]:border-destructive";
 
 type Props = {
   entity: Entity;

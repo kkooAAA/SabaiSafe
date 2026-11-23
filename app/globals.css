@@ -2,44 +2,98 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* shadcn/ui (new-york, neutral) tokens + SabaiSafe accents. Light theme only for now. */
+/*
+ * SabaiSafe "longtail ribbons". Light theme only.
+ * Ink + daylight for text and surfaces; one ribbon colour per feature (Legal, Report, Price, Help) used on its
+ * home tile, nav indicator and page-title stripe. Red is reserved for Help / emergency.
+ * Contrast (WCAG 2.x): ink on daylight 14.3:1, ink on white 15.0:1, muted-fg on white 6.1:1 / on daylight 5.8:1,
+ * white on legal 7.5:1, white on report 7.4:1, ink on price 6.7:1 (white on price fails: 2.3:1, never use it),
+ * white on help 5.1:1, price-text on white 5.9:1, input border on white 3.2:1, ring on white 7.5:1.
+ */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Primary: calm sea teal */
-  --primary: oklch(0.48 0.09 200);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.48 0 0);
-  --accent: oklch(0.96 0.02 200);
-  --accent-foreground: oklch(0.205 0 0);
+
+  /* Palette */
+  --ink: #0e2a33; /* Andaman ink */
+  --daylight: #f7fafa;
+  --ribbon-legal: #2f4bb8; /* indigo */
+  --ribbon-legal-foreground: #ffffff;
+  --ribbon-report: #6a3fa0; /* orchid */
+  --ribbon-report-foreground: #ffffff;
+  --ribbon-price: #e0a21a; /* marigold: ink text only */
+  --ribbon-price-foreground: #0e2a33;
+  --ribbon-price-text: #8a5a00; /* marigold as text on light surfaces */
+  --ribbon-help: #d0312d; /* signal red: Help and emergency only */
+  --ribbon-help-foreground: #ffffff;
+
+  /* shadcn tokens */
+  --background: var(--daylight);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: #ffffff;
+  --secondary: #eaf0f1;
+  --secondary-foreground: var(--ink);
+  --muted: #eef3f4;
+  --muted-foreground: #4e6670;
+  --accent: #e6eef0;
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.6 0.09 200);
+  --border: #d6e1e4;
+  --input: #7d939b;
+  --ring: var(--ribbon-legal);
+
   /* Status colours */
-  --emergency: oklch(0.52 0.2 27);
-  --emergency-foreground: oklch(0.99 0 0);
+  --emergency: var(--ribbon-help);
+  --emergency-foreground: #ffffff;
   --warning: oklch(0.93 0.08 85);
   --warning-foreground: oklch(0.38 0.08 70);
   --success: oklch(0.94 0.05 150);
   --success-foreground: oklch(0.38 0.09 150);
 }
 
+/* Type scale + motion (non-inline: these generate text-* / animate-* utilities) */
+@theme {
+  --text-display: 4rem; /* hotline numbers, road-sign size */
+  --text-display--line-height: 1;
+  --text-title: 1.75rem; /* page h1 */
+  --text-title--line-height: 1.2;
+  --text-row: 1.125rem; /* home row titles */
+  --text-row--line-height: 1.35;
+  --animate-ribbon-in: ribbon-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes ribbon-in {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+}
+
 @theme inline {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans Thai", sans-serif;
+  --font-sans: var(--font-atkinson), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC",
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Thai", sans-serif;
+  --font-thai: var(--font-sarabun), "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-ink: var(--ink);
+  --color-daylight: var(--daylight);
+  --color-ribbon-legal: var(--ribbon-legal);
+  --color-ribbon-legal-foreground: var(--ribbon-legal-foreground);
+  --color-ribbon-report: var(--ribbon-report);
+  --color-ribbon-report-foreground: var(--ribbon-report-foreground);
+  --color-ribbon-price: var(--ribbon-price);
+  --color-ribbon-price-foreground: var(--ribbon-price-foreground);
+  --color-ribbon-price-text: var(--ribbon-price-text);
+  --color-ribbon-help: var(--ribbon-help);
+  --color-ribbon-help-foreground: var(--ribbon-help-foreground);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -68,7 +122,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
   html {
     -webkit-text-size-adjust: 100%;
@@ -76,5 +130,22 @@
   body {
     @apply bg-background text-foreground antialiased;
     overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
+  /* Visible keyboard focus everywhere. Components with their own focus ring (shadcn) override this via utilities. */
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

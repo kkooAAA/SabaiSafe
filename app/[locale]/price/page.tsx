@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { RIBBON_TITLE } from "@/components/shell/nav-items";
 import { findPrices } from "@/lib/db/prices";
 import type { PriceRef } from "@/types/api";
 import { PriceExplorer } from "@/components/price/PriceExplorer";
@@ -34,7 +35,7 @@ export default async function PricePage({ params }: Props) {
   return (
     <div className="space-y-5">
       <section>
-        <h1 className="text-2xl font-bold leading-tight">{t("title")}</h1>
+        <h1 className={`text-title font-bold ${RIBBON_TITLE.price}`}>{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("intro")}</p>
       </section>
       {rows === null ? (

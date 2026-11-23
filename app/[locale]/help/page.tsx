@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { RIBBON_TITLE } from "@/components/shell/nav-items";
 import { getHelp } from "@/lib/db/help";
 import type { HelpResponse } from "@/types/api";
 import { HotlineList } from "@/components/help/HotlineList";
@@ -40,7 +41,7 @@ export default async function HelpPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <section>
-        <h1 className="text-2xl font-bold leading-tight">{t("title")}</h1>
+        <h1 className={`text-title font-bold ${RIBBON_TITLE.help}`}>{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("intro")}</p>
       </section>
 

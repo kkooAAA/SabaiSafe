@@ -2,6 +2,31 @@
 
 Newest first. One short entry per finished task: date, teammate, what changed, how it was checked.
 
+## 2026-11-23 — qa — review: longtail ribbons redesign (tokens/shell/home)
+- PASS. typecheck, lint, test (1370/1370), build all pass. Rendered with `next start` + headless Chrome (CDP) at 375px,
+  en + zh, home + 4 feature pages: no horizontal scroll, h1 ribbon stripes correct, ink primary buttons, html lang en/zh-CN.
+- Keyboard Tab walk: marigold outline on the ink header, white on the red strip, indigo on white rows/nav/Call button.
+  Reduced motion: ribbons drawn with no animation. Thai preview `font-thai` -> Sarabun. tel: links only from lib/hotlines.
+- Only the ring/50 -> ring line changed in the 11 ui/feature files. Low notes sent to frontend: the 1155 block always wraps
+  at 375px (fits ~3px short), and Noto Sans SC adds 63 KB gzip of render-blocking @font-face CSS to every page.
+- Added `tests/design-ribbons.test.tsx` (20 tests).
+- db-smoke fix (`tests/sql/smoke.sql` fixture only): zh chunks are now i in (2,4,6,8,10) instead of 26..30 (the 5 lowest
+  similarities), so match_legal(lang=null) top 20 holds both languages. All match_legal assertions re-checked with a JS
+  model of the RPC; not run on Postgres locally (Docker daemon not running), CI db-smoke will confirm.
+- Recheck after frontend's follow-ups: PASS. 1155 + Call sit side by side at 375px (en, zh); Noto Sans SC removed
+  (build: 15 @font-face = Atkinson + Sarabun only, no Noto SC files); zh pages render CJK in the system font
+  (Microsoft YaHei on Windows), no tofu. typecheck, lint, test 1370/1370, clean build pass.
+
+## 2026-11-23 — frontend — design: longtail ribbons tokens/shell/home
+- `app/globals.css` (lead-authorised): ink #0E2A33 primary/text, daylight #F7FAFA background, white cards, ribbon tokens
+  (legal #2F4BB8, report #6A3FA0, price #E0A21A with ink text, help #D0312D = emergency), blue-grey muted/border/input,
+  indigo focus ring (3px, full strength; marigold on the ink header, white on the red strip), type scale (title/row/display),
+  one ribbon draw-in on home (off under prefers-reduced-motion).
+- Fonts via next/font: Atkinson Hyperlegible Next 400/700/800 and Sarabun thai 400/700 (`font-thai`, Thai report only); Chinese uses system CJK fonts (Noto Sans SC dropped, lead-approved).
+- Shell: ink header with ribbon mark + EN | 中 segmented switch, ribbon indicator in BottomNav, EmergencyStrip pills 6.5:1.
+  `nav-items.ts` gains `ribbon` + class maps; feature h1s get their ribbon stripe. Home: situation-first rows + Tourist Police 1155 block.
+- Checked: pnpm typecheck, lint, test (1350 pass), build; /en and /zh (+ feature pages) render 200 via next start.
+
 ## 2026-11-23 — qa — DB-mode verification on the real Supabase project (production; no chat/generate calls)
 - `next build` + `next start` (repo copy, DB mode, SAMPLE_REPORTS_IN_MEMORY=0 for the run): 56/56 HTTP/REST checks pass,
   plus 6/6 match_legal checks.
@@ -324,3 +349,8 @@ Newest first. One short entry per finished task: date, teammate, what changed, h
 - Repo skeleton: Next.js 15 + TS strict + Tailwind 4 + next-intl (en/zh) + Vitest + ESLint, CI workflow.
 - `middleware.ts`: locale routing, per-IP rate limit on `/api/*`, Basic auth for admin.
 - `lib/hotlines.ts`, `lib/rate-limit.ts`, `types/api.ts`, `docs/contracts.md` v0.1, `.env.example`.
+
+## 2026-11-23 — lead — dev server uses Turbopack
+- `pnpm dev` is now `next dev --turbopack` (user-approved): pages compiled slowly the first time with webpack on Windows.
+  `pnpm dev:webpack` keeps the old bundler for comparison. README "Run locally" updated (Turbopack, restart after
+  editing `.env.local`, use `pnpm build && pnpm start` to judge real speed). Build and production are unchanged.

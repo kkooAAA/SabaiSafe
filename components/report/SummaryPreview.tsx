@@ -65,7 +65,7 @@ export function SummaryPreview({ summary }: { summary: Summary }) {
       <p className="text-sm text-muted-foreground">{t("checkHint")}</p>
       {parts ? (
         <>
-          <section lang="th" aria-label={t("thai")} className="rounded-xl border bg-card p-3" data-testid="report-th">
+          <section lang="th" aria-label={t("thai")} className="rounded-xl border bg-card p-3 font-thai" data-testid="report-th">
             <Markdown>{parts.th}</Markdown>
           </section>
           <section lang="en" aria-label={t("english")} className="rounded-xl border bg-card p-3" data-testid="report-en">

@@ -11,7 +11,7 @@ const PriceCheck = dynamic(() => import("./PriceCheck").then((m) => m.PriceCheck
 import { buildAreas, buildItemGroups, filterPrices, sortPrices } from "./picker";
 
 const selectCls =
-  "h-11 w-full min-w-0 rounded-md border bg-background px-3 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none";
+  "h-11 w-full min-w-0 rounded-md border bg-background px-3 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none";
 
 export function PriceExplorer({ rows }: { rows: PriceRef[] }) {
   const lang = (useLocale() === "zh" ? "zh" : "en") satisfies UiLang;

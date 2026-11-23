@@ -127,7 +127,7 @@ export function LegalGuide() {
           placeholder={t("placeholder")}
           aria-invalid={inputError ? true : undefined}
           aria-describedby={inputError ? "legal-q-err" : "legal-q-count"}
-          className="w-full min-w-0 resize-y rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          className="w-full min-w-0 resize-y rounded-md border bg-background px-3 py-2 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
         />
         <div className="flex items-center gap-2">
           <span id="legal-q-count" className="mr-auto text-xs text-muted-foreground tabular-nums">

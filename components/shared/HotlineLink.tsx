@@ -6,7 +6,7 @@ type Props = {
   number: string;
   label: string;
   className?: string;
-  /** "strip": compact white-on-red pill; "card": large row for the Help page. */
+  /** "strip": compact white-on-red pill (white on red darkened 15% = 6.5:1); "card": large row for the Help page. */
   variant?: "strip" | "card";
 };
 
@@ -33,12 +33,12 @@ export function HotlineLink({ number, label, className, variant = "strip" }: Pro
       href={telHref(number)}
       aria-label={`${label} ${number}`}
       className={cn(
-        "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-md bg-white/15 px-1 py-1 leading-tight active:bg-white/30",
+        "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-md bg-black/15 px-1 py-1 leading-tight active:bg-black/30",
         className,
       )}
     >
       <span className="text-base font-bold tabular-nums">{number}</span>
-      <span className="w-full truncate text-center text-[11px] opacity-90">{label}</span>
+      <span className="w-full truncate text-center text-xs">{label}</span>
     </a>
   );
 }

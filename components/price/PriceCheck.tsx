@@ -18,7 +18,7 @@ type Status = "idle" | "loading" | "done" | "error";
 type Checked = { verdict: PriceVerdict; refs: PriceRef[] };
 
 const inputCls =
-  "h-11 w-full min-w-0 rounded-md border bg-background px-3 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none";
+  "h-11 w-full min-w-0 rounded-md border bg-background px-3 text-base shadow-xs focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none";
 
 const VERDICT_STYLE: Record<PriceVerdict, string> = {
   "Within normal range": "bg-success text-success-foreground",

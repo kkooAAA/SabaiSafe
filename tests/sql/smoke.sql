@@ -6,15 +6,19 @@
 begin;
 
 -- ---------------------------------------------------------------- fixtures (rolled back at the end)
--- 25 en + 5 zh chunks; chunk i = (1 in dim 1, i/10 in dim i+1), so cosine similarity to the query (dim 1 only)
+-- 25 en + 5 zh chunks, interleaved: zh = i in (2,4,6,8,10), en = the rest (1, 3, 5, 7, 9, 11..30).
+-- chunk i = (1 in dim 1, i/10 in dim i+1), so cosine similarity to the query (dim 1 only)
 -- is 1/sqrt(1 + (i/10)^2): strictly decreasing with i, all distinct.
+-- zh must sit among the HIGHEST similarities: the unfiltered top 20 (lang=null) is i 1..20 = 15 en + 5 zh,
+-- so it has 2 languages. (zh at i 26..30 were the 5 lowest, so lang=null returned only en.)
+-- Still: en has 25 rows (cap 20 holds), zh has 5, the top en hit is qa-smoke-1.
 create temporary table _vec as
 select i, ('[' || array_to_string(array(select case when d = 1 then 1.0 when d = i + 1 then i * 0.1 else 0 end
                                         from generate_series(1, 1536) d), ',') || ']')::extensions.vector(1536) as v
 from generate_series(1, 30) i;
 
 insert into public.legal_chunks (doc_slug, chunk_index, lang, title, law, topic, status, content, content_hash, embedding)
-select 'qa-smoke-' || i, 0, case when i <= 25 then 'en' else 'zh' end, 'QA ' || i, 'QA law', 'other', 'DRAFT',
+select 'qa-smoke-' || i, 0, case when i in (2, 4, 6, 8, 10) then 'zh' else 'en' end, 'QA ' || i, 'QA law', 'other', 'DRAFT',
        'qa smoke chunk ' || i, md5(i::text), v
 from _vec;
 
